@@ -8,7 +8,7 @@ namespace Pet_s_Land.Servies
     public interface IProductsServices
     {
         Task<ResponseDto<object>> AddProductAsync(ProductDto productdata);
-        //Task<List<Product>> GetAllProductsAsync();
+        Task<ResponseDto<List<Product>>> GetAllProductsAsync();
     }
 
     public class ProductsServices : IProductsServices
@@ -26,6 +26,12 @@ namespace Pet_s_Land.Servies
         {
             return await _productsRepo.AddProductAsync(productdata);
         }
+        public async Task<ResponseDto<List<Product>>> GetAllProductsAsync()
+
+        {
+            return await _productsRepo.GetAllProductsAsync();
+        }
+
 
 
 

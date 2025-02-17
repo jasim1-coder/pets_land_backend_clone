@@ -11,7 +11,7 @@
 
         public ResponseDto(T data, string message, int statusCode, string error = null)
         {
-            Data = data;
+            Data = data ;
             Message = message;
             StatusCode = statusCode;
             Error = error;

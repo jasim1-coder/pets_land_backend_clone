@@ -11,7 +11,7 @@ namespace Pet_s_Land.Repositories
     public interface IProductsRepo
     {
         Task<ResponseDto<object>> AddProductAsync(ProductDto productData);
-        //Task<List<Product>> GetAllProductsAsync();
+        Task<ResponseDto<List<Product>>> GetAllProductsAsync();
     }
 
     public class ProductsRepo : IProductsRepo
@@ -34,7 +34,7 @@ namespace Pet_s_Land.Repositories
 
             if (string.IsNullOrEmpty(imageUrl))
             {
-                return new ResponseDto<object> ( productData, "Image upload failed",500 );
+                return new ResponseDto<object>(productData, "Image upload failed", 500);
             }
 
             var product = _mapper.Map<Product>(productData);
@@ -43,12 +43,24 @@ namespace Pet_s_Land.Repositories
             _appDbContext.Products.Add(product);
             await _appDbContext.SaveChangesAsync();
 
-            return new ResponseDto<object> (productData,"Product added successfully",200 );
+            return new ResponseDto<object>(productData, "Product added successfully", 200);
         }
 
-        public async Task<List<Product>> GetAllProductsAsync()
+        public async Task<ResponseDto<List<Product>>> GetAllProductsAsync()
         {
-            return await _appDbContext.Products.ToListAsync();
+            var result = await _appDbContext.Products.ToListAsync();
+            if (result.Count > 0)
+            {
+                return new ResponseDto<List<Product>>(result, "List of all Products", 200);
+            }
+            else
+            {
+                return new ResponseDto<List<Product>>(null, "No items in Table", 404);
+            }
+
+
+
+
         }
     }
 }

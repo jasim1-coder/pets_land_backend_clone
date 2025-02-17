@@ -50,5 +50,15 @@ namespace Pet_s_Land.Controllers
 
             return Ok(new { message = "Product added successfully", product = result });
         }
+
+        [HttpGet("Get all product")]
+        public async Task<ResponseDto<List<Product>>> GetAllProductsAsync()
+        {
+            return await _productsRepo.GetAllProductsAsync();
+            
+            //return StatusCode(result.StatusCode,result);
+           
+        }
+
     }
 }
