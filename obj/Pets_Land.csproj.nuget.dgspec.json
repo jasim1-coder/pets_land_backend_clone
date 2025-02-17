@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pet's_Land\\Pets_Land.csproj": {}
+    "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pets_Land\\Pets_Land.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pet's_Land\\Pets_Land.csproj": {
+    "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pets_Land\\Pets_Land.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pet's_Land\\Pets_Land.csproj",
+        "projectUniqueName": "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pets_Land\\Pets_Land.csproj",
         "projectName": "Pets_Land",
-        "projectPath": "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pet's_Land\\Pets_Land.csproj",
+        "projectPath": "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pets_Land\\Pets_Land.csproj",
         "packagesPath": "C:\\Users\\jasim\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pet's_Land\\obj\\",
+        "outputPath": "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pets_Land\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -58,6 +58,14 @@
               "target": "Package",
               "version": "[4.0.3, )"
             },
+            "CloudinaryDotNet": {
+              "target": "Package",
+              "version": "[1.27.4, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.4, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[9.0.2, )"
@@ -75,6 +83,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.6.2, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.4.0, )"
             }
           },
           "imports": [

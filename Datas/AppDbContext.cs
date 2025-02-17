@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Pet_s_Land.Models.ProductsModels;
 using Pet_s_Land.Models.UserModels;
 
 namespace Pet_s_Land.Datas
@@ -10,6 +11,14 @@ namespace Pet_s_Land.Datas
 
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Product> Products { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .Property(u => u.Role)
+                .HasDefaultValue("User");
+        }
 
 
     }

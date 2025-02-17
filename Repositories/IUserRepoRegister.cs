@@ -39,7 +39,7 @@ namespace Pet_s_Land.Repositories
                 await _appDbContext.Users.AddAsync(user);
                 await _appDbContext.SaveChangesAsync();
 
-                var userDto = _mapper.Map<UserDto>(user);
+                var userDto = _mapper.Map<User>(user);
                 return new ResponseDto<object>(userDto, "User registered successfully", 201);
 
             }

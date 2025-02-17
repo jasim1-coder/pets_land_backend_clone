@@ -1,5 +1,8 @@
-
+using System.Text;
+using CloudinaryDotNet;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Pet_s_Land.Datas;
 using Pet_s_Land.Mapping;
 using Pet_s_Land.Repositories;
@@ -13,16 +16,53 @@ namespace Pet_s_Land
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container
-            builder.Services.AddDbContext<AppDbContext>(options=> 
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddAutoMapper(typeof(MappingProfile));
-            builder.Services.AddScoped<IRegisterUser, RegisterUsers>();
+            // Load JWT Secret Key from configuration
+            var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key is missing."));
 
+            // Cloudinary Configuration
+            builder.Services.AddSingleton(x =>
+            {
+                var cloudinaryAccount = new Account(
+                    builder.Configuration["Cloudinary:CloudName"],
+                    builder.Configuration["Cloudinary:ApiKey"],
+                    builder.Configuration["Cloudinary:ApiSecret"]);
+                return new Cloudinary(cloudinaryAccount);
+            });
+
+
+            // Add services to the container
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+            builder.Services.AddScoped<IRegisterUser, RegisterUsers>();
             builder.Services.AddScoped<IUserRepoRegister, UserRepoRegister>();
+            builder.Services.AddScoped<JwtService>(); // Register JWT Service
+
+            // Configure JWT Authentication
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false; // Set this to true in production
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+                        ValidAudience = builder.Configuration["JwtSettings:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(key)
+                    };
+                });
+
+            builder.Services.AddAuthorization();
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Swagger setup
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -37,8 +77,9 @@ namespace Pet_s_Land
 
             app.UseHttpsRedirection();
 
+            // Authentication should come before Authorization
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

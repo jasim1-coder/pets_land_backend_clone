@@ -24,7 +24,7 @@ namespace Pet_s_Land.Models.UserModels
          ErrorMessage = "Password must contain at least one letter, one number, and one special character.")]
         public string Password { get; set; }
 
-        //public string? Role { get; set; }
+        public string? Role { get; set; } = "User";
         //public bool IsBlocked { get; set; }
         //public virtual Cart? Cart { get; set; }
 
