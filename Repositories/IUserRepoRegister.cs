@@ -11,6 +11,7 @@ namespace Pet_s_Land.Repositories
     public interface IUserRepoRegister
     {
         Task<ResponseDto<object>> RegisterUser(UserDto userDto);
+
     }
     public class UserRepoRegister : IUserRepoRegister
     {

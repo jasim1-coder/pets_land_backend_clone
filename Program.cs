@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Pet_s_Land.Datas;
 using Pet_s_Land.Mapping;
 using Pet_s_Land.Repositories;
+using Pet_s_Land.Services;
 using Pet_s_Land.Servies;
 
 namespace Pet_s_Land
@@ -20,14 +21,8 @@ namespace Pet_s_Land
             var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key is missing."));
 
             // Cloudinary Configuration
-            builder.Services.AddSingleton(x =>
-            {
-                var cloudinaryAccount = new Account(
-                    builder.Configuration["Cloudinary:CloudName"],
-                    builder.Configuration["Cloudinary:ApiKey"],
-                    builder.Configuration["Cloudinary:ApiSecret"]);
-                return new Cloudinary(cloudinaryAccount);
-            });
+            builder.Services.AddSingleton<ICloudinaryService, CloudinaryService>();
+
 
 
             // Add services to the container
@@ -38,6 +33,8 @@ namespace Pet_s_Land
 
             builder.Services.AddScoped<IRegisterUser, RegisterUsers>();
             builder.Services.AddScoped<IUserRepoRegister, UserRepoRegister>();
+            builder.Services.AddScoped<IProductsServices, ProductsServices>();
+            builder.Services.AddScoped<IProductsRepo, ProductsRepo>();
             builder.Services.AddScoped<JwtService>(); // Register JWT Service
 
             // Configure JWT Authentication

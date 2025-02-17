@@ -11,7 +11,7 @@ namespace Pet_s_Land.Mapping
         CreateMap<UserDto, User>()
             .ForMember(dest => dest.Password, opt => opt.Ignore());
 
-         CreateMap<Product, ProductDto>()
+         CreateMap<ProductDto, Product>()
             .ForMember(dest => dest.Ingredients, opt => opt.MapFrom(src => src.Ingredients));
         }
     }
