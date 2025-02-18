@@ -5,25 +5,24 @@
 namespace Pet_s_Land.Migrations
 {
     /// <inheritdoc />
-    public partial class Adddefaultvalue : Migration
+    public partial class secondcreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Role",
-                table: "Users",
-                type: "nvarchar(max)",
-                nullable: true,
-                defaultValue: "User");
+            migrationBuilder.RenameColumn(
+                name: "CategoryId",
+                table: "Products",
+                newName: "Category");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Role",
-                table: "Users");
+            migrationBuilder.RenameColumn(
+                name: "Category",
+                table: "Products",
+                newName: "CategoryId");
         }
     }
 }

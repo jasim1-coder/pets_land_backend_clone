@@ -92,6 +92,89 @@
     ]
   },
   {
+    "ContainingType": "Pet_s_Land.Controllers.ProductsController",
+    "Method": "GetProductByCategoryAsync",
+    "RelativePath": "api/Products/Get Product By Category",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Category",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Pet_s_Land.DTOs.ResponseDto\u00601[[System.Collections.Generic.List\u00601[[Pet_s_Land.Models.ProductsModels.Product, Pets_Land, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Pet_s_Land.Controllers.ProductsController",
+    "Method": "GetProductByIdAsync",
+    "RelativePath": "api/Products/Get Product By Id",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Pet_s_Land.DTOs.ResponseDto\u00601[[Pet_s_Land.Models.ProductsModels.Product, Pets_Land, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Pet_s_Land.Controllers.ProductsController",
+    "Method": "GetProductPaginatedAsync",
+    "RelativePath": "api/Products/Get Product Paginated",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "pageNum",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Pet_s_Land.DTOs.ResponseDto\u00601[[System.Collections.Generic.List\u00601[[Pet_s_Land.Models.ProductsModels.Product, Pets_Land, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "Pet_s_Land.Controllers.UserController",
     "Method": "RegisterUser",
     "RelativePath": "api/User/SignUp",

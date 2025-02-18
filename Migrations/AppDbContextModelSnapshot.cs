@@ -91,9 +91,7 @@ namespace Pet_s_Land.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Role")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("User");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
                         .IsRequired()

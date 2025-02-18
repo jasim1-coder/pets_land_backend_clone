@@ -12,6 +12,13 @@ namespace Pet_s_Land.Repositories
     {
         Task<ResponseDto<object>> AddProductAsync(ProductDto productData);
         Task<ResponseDto<List<Product>>> GetAllProductsAsync();
+
+        Task<ResponseDto<Product>> GetProductByIdAsync(int Id);
+        Task<ResponseDto<List<Product>>> GetProductByCategryAsync(string Category);
+
+        Task<ResponseDto<List<Product>>> GetProductsByPaginatedAsync(int pageNum, int pageSize);
+
+
     }
 
     public class ProductsRepo : IProductsRepo
@@ -32,12 +39,15 @@ namespace Pet_s_Land.Repositories
             // Upload the image using CloudinaryService
             var imageUrl = await _cloudinaryService.UploadImageAsync(productData.Image);
 
+
             if (string.IsNullOrEmpty(imageUrl))
             {
                 return new ResponseDto<object>(productData, "Image upload failed", 500);
             }
 
             var product = _mapper.Map<Product>(productData);
+
+
             product.Image = imageUrl;
 
             _appDbContext.Products.Add(product);
@@ -58,9 +68,73 @@ namespace Pet_s_Land.Repositories
                 return new ResponseDto<List<Product>>(null, "No items in Table", 404);
             }
 
+        }
+
+        public async Task<ResponseDto<Product>> GetProductByIdAsync(int Id)
+        {
+
+            var result = await _appDbContext.Products.FirstOrDefaultAsync(product => product.Id == Id);
+
+            if (result != null)
+            {
+                return new ResponseDto<Product>(result, "Product by Id", 200);
+            }
+            else
+            {
+                return new ResponseDto<Product>(null, "No item wtih such Id in Table", 404);
+            }
+
+        }
+
+
+        public async Task<ResponseDto<List<Product>>> GetProductByCategryAsync(string Category)
+        {
+            var result = await _appDbContext.Products.Where(product => product.Category.ToLower() == Category.ToLower()).ToListAsync();
+            if (result != null)
+            {
+                return new ResponseDto<List<Product>>(result, "List of product in this category", 200);
+            }
+            else
+            {
+                return new ResponseDto<List<Product>>(null, "No items in such category", 404);
+            }
+        }
+
+
+
+        public async Task<ResponseDto<List<Product>>> GetProductsByPaginatedAsync(int pageNum, int pageSize)
+        {
+            var skip = (pageNum - 1) * pageSize;
+
+            var result = await _appDbContext.Products.Skip(skip).Take(pageSize).ToListAsync();
+            //var totalItems = await _appDbContext.Products.CountAsync();
+            //var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            if (result.Count > 0)
+            {
+                //var paginationInfo = new
+                //{
+                //    PageNumber = pageNumber,
+                //    PageSize = pageSize,
+                //    TotalItems = totalItems,
+                //    TotalPages = totalPages
+                //};
+                
+
+                    return new ResponseDto<List<Product>>(result, "List of products", 200);
+
+                }
+
+
+                 else
+                {
+                    return new ResponseDto<List<Product>>(null, "No products found", 404);
+                }
+
+
+            }
 
 
 
         }
-    }
-}
+    } 

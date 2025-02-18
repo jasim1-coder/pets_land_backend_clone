@@ -60,5 +60,24 @@ namespace Pet_s_Land.Controllers
            
         }
 
+        [HttpGet("Get Product By Id")]
+        public async Task<ResponseDto<Product>> GetProductByIdAsync(int Id)
+        {
+            return await _productsRepo.GetProductByIdAsync(Id);
+        }
+
+        [HttpGet("Get Product By Category")]
+        public async Task<ResponseDto<List<Product>>> GetProductByCategoryAsync(string Category)
+        {
+            return await _productsRepo.GetProductByCategryAsync(Category);
+        }
+
+        [HttpGet("Get Product Paginated")]
+        public async Task<ResponseDto<List<Product>>> GetProductPaginatedAsync(int pageNum, int pageSize)
+        {
+            return await _productsRepo.GetProductsByPaginatedAsync(pageNum, pageSize);
+
+        }
+
     }
 }
