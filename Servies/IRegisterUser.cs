@@ -16,8 +16,8 @@ namespace Pet_s_Land.Servies
 
         public RegisterUsers(IUserRepoRegister userRepository, IMapper mapper)
         {
-            _userRepository = userRepository;
-            _mapper = mapper;
+            userRepository = _userRepository;
+            mapper = _mapper;
         }
         public async Task<ResponseDto<object>> RegisterUser(UserDto regdata)
         {

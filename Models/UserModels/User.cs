@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Pet_s_Land.Models.ProductsModels;
+using Pet_s_Land.Models.WhishlistModel;
 
 namespace Pet_s_Land.Models.UserModels
 {
@@ -30,7 +31,7 @@ namespace Pet_s_Land.Models.UserModels
         //public virtual Cart? Cart { get; set; }
 
         //public virtual List<OrderMain> Orders { get; set; }
-        public List<WishList> WishList { get; set; } = new List<Product>();
+        public List<WishList> WishList { get; set; }
 
         //public ICollection<Address> Addresses { get; set; }
     }

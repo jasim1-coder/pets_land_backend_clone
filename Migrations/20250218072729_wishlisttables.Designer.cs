@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pet_s_Land.Datas;
 
@@ -10,9 +11,11 @@ using Pet_s_Land.Datas;
 namespace Pet_s_Land.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250218072729_wishlisttables")]
+    partial class wishlisttables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,7 +105,7 @@ namespace Pet_s_Land.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Pet_s_Land.Models.WhishlistModel.WishList", b =>
+            modelBuilder.Entity("Pet_s_Land.Models.WhishlistModel.Whishlist", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -127,10 +130,10 @@ namespace Pet_s_Land.Migrations
 
                     b.HasIndex("UserId1");
 
-                    b.ToTable("WishLists");
+                    b.ToTable("whishlists");
                 });
 
-            modelBuilder.Entity("Pet_s_Land.Models.WhishlistModel.WishList", b =>
+            modelBuilder.Entity("Pet_s_Land.Models.WhishlistModel.Whishlist", b =>
                 {
                     b.HasOne("Pet_s_Land.Models.ProductsModels.Product", "Products")
                         .WithMany()

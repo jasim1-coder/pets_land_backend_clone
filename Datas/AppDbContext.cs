@@ -13,19 +13,19 @@ namespace Pet_s_Land.Datas
 
         public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Whishlist> whishlists { get; set; }
+        public DbSet<WishList> WishLists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Whishlist>()
+            modelBuilder.Entity<WishList>()
                 .HasOne(w => w.Users)
                 .WithMany()
                 .HasForeignKey(w => w.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Whishlist>()
+            modelBuilder.Entity<WishList>()
                 .HasOne(w => w.Products)
                 .WithMany()
                 .HasForeignKey(w => w.ProductId)

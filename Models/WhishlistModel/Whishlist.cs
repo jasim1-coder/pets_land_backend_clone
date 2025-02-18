@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Pet_s_Land.Models.WhishlistModel
 {
-    public class Whishlist
+    public class WishList
     {
         [Required]
         public int Id { get; set; }

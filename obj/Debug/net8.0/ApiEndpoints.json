@@ -189,5 +189,51 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Pet_s_Land.Controllers.WishListController",
+    "Method": "AddOrRemoveFromWishlist",
+    "RelativePath": "api/WishList/AddOrRemoveFrom WishList",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ProductId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Pet_s_Land.DTOs.ResponseDto\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Pet_s_Land.Controllers.WishListController",
+    "Method": "GetWishlist",
+    "RelativePath": "api/WishList/GetWishList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Pet_s_Land.DTOs.ResponseDto\u00601[[System.Collections.Generic.List\u00601[[Pet_s_Land.DTOs.WishListResDto, Pets_Land, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   }
 ]
