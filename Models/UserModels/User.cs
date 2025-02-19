@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
-using Pet_s_Land.Models.ProductsModels;
+using Pet_s_Land.Models.CartModels;
 using Pet_s_Land.Models.WhishlistModel;
 
 namespace Pet_s_Land.Models.UserModels
@@ -28,7 +28,7 @@ namespace Pet_s_Land.Models.UserModels
 
         public string? Role { get; set; } = "User";
         //public bool IsBlocked { get; set; }
-        //public virtual Cart? Cart { get; set; }
+        public virtual Cart? Cart { get; set; }
 
         //public virtual List<OrderMain> Orders { get; set; }
         public List<WishList> WishList { get; set; }

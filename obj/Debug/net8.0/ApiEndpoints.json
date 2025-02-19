@@ -16,6 +16,52 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Pet_s_Land.Controllers.CartController",
+    "Method": "AddToCart",
+    "RelativePath": "api/Cart/AddToCart",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Pet_s_Land.DTOs.ResponseDto\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Pet_s_Land.Controllers.CartController",
+    "Method": "GetCartItems",
+    "RelativePath": "api/Cart/GetCart Items",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Pet_s_Land.DTOs.ResponseDto\u00601[[Pet_s_Land.DTOs.CartResDto, Pets_Land, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "Pet_s_Land.Controllers.ProductsController",
     "Method": "AddProduct",
     "RelativePath": "api/Products/add",

@@ -38,6 +38,8 @@ namespace Pet_s_Land
             builder.Services.AddScoped<IProductsRepo, ProductsRepo>();
             builder.Services.AddScoped<IWishListServices, WishListServices>();
             builder.Services.AddScoped<IWishListRep, WishListRep>();
+            builder.Services.AddScoped<ICartServices, CartServices>();
+            builder.Services.AddScoped<ICartRepo, CartRepo>();
             builder.Services.AddScoped<JwtService>(); // Register JWT Service
 
             // Configure JWT Authentication
