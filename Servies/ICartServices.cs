@@ -9,10 +9,10 @@ namespace Pet_s_Land.Servies
     {
         Task<ResponseDto<CartResDto>> GetCartItems(int userId);
         Task<ResponseDto<object>> AddToCart(int userId, int productId);
-        //Task<ResponseDto<object>> RemoveFromCart(int userId, int productId);
-        //Task<ResponseDto<object>> IncreaseQty(int userId, int productId);
-        //Task<ResponseDto<object>> DecreaseQty(int userId, int productId);
-        //Task<ResponseDto<object>> RemoveAllItems(int userId);
+        Task<ResponseDto<object>> RemoveFromCart(int userId, int productId);
+        Task<ResponseDto<object>> IncreaseQty(int userId, int productId);
+        Task<ResponseDto<object>> DecreaseQty(int userId, int productId);
+        Task<ResponseDto<object>> RemoveAllItems(int userId);
 
     }
 
@@ -35,25 +35,25 @@ namespace Pet_s_Land.Servies
         {
             return await _cartRepo.GetCartItems(userId);
         }
-        //public async Task<ResponseDto<object>> RemoveFromCart(int userId, int productId)
-        //{
-        //    return await _cartRepo.RemoveFromCart(userId,productId);
-        //}
+        public async Task<ResponseDto<object>> RemoveFromCart(int userId, int productId)
+        {
+            return await _cartRepo.RemoveFromCart(userId, productId);
+        }
 
-        //public async Task<ResponseDto<object>> IncreaseQty(int userId, int productId)
-        //{
-        //    return await _cartRepo.IncreaseQty(userId, productId);
-        //}
+        public async Task<ResponseDto<object>> IncreaseQty(int userId, int productId)
+        {
+            return await _cartRepo.IncreaseQty(userId, productId);
+        }
 
-        //public async Task<ResponseDto<object>> DecreaseQty(int userId, int productId)
-        //{
-        //    return await _cartRepo.DecreaseQty(userId, productId);
-        //}
+        public async Task<ResponseDto<object>> DecreaseQty(int userId, int productId)
+        {
+            return await _cartRepo.DecreaseQty(userId, productId);
+        }
 
-        //public async Task<ResponseDto<object>> RemoveAllItems(int userId)
-        //{
-        //    return await _cartRepo.RemoveAllItems(userId);
-        //}
+        public async Task<ResponseDto<object>> RemoveAllItems(int userId)
+        {
+            return await _cartRepo.RemoveAllItems(userId);
+        }
 
 
     }

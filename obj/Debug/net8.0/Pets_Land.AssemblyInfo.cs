@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Pets_Land")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+140cb34d38dd021dd7f6e30fa756e5c0a606baaa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b8dca2e11b494aef69f02d026f62ab8f32869647")]
 [assembly: System.Reflection.AssemblyProductAttribute("Pets_Land")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Pets_Land")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

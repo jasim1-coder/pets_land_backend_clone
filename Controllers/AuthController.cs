@@ -6,18 +6,21 @@ using Pet_s_Land.Servies;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Pet_s_Land.Repositories;
 
 [Route("api/auth")]
 [ApiController]
 public class AuthController : ControllerBase
 {
+    private readonly IUserRepoRegister _userRepoRegister;
     private readonly AppDbContext _context;
     private readonly JwtService _jwtService;
 
-    public AuthController(AppDbContext context, JwtService jwtService)
+    public AuthController(AppDbContext context, JwtService jwtService, IUserRepoRegister userRepoRegister)
     {
         _context = context;
         _jwtService = jwtService;
+        _userRepoRegister = userRepoRegister;
     }
 
     [HttpPost("login")]
@@ -47,5 +50,19 @@ public class AuthController : ControllerBase
             Expiration = expiration
         });
     }
+    [HttpPost("SignUp")]
+    public async Task<ActionResult> RegisterUser(UserDto newUser)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new { Message = "Invalid input data", StatusCode = 400 });
+        }
+        var result = await _userRepoRegister.RegisterUser(newUser);
+        if (result.stausCode == 500)
+        {
+            return BadRequest(result);
+        }
 
+        return CreatedAtAction(nameof(RegisterUser), new { email = newUser.Email }, result);
+    }
 }

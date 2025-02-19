@@ -50,6 +50,60 @@ namespace Pet_s_Land.Controllers
 
         }
 
+        [HttpDelete("DeleteProductFromCart")]
+        public async Task<ResponseDto<object>> RemoveFromCart(int productId)
+        {
+            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
+
+            if (userIdClaim == null)
+            {
+                return new ResponseDto<object>(null, "Unauthorized: User ID not found.", 401, "Invalid Token");
+            }
+
+            int UserId = int.Parse(userIdClaim.Value);
+
+            return await _cartRepo.RemoveFromCart(UserId, productId);
+        }
+
+        [HttpPost("IncreaseQuantity")]
+        public async Task<ResponseDto<object>> IncreaseQty(int productId)
+        {
+            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
+
+            if (userIdClaim == null)
+            {
+                return new ResponseDto<object>(null, "Unauthorized: User ID not found.", 401, "Invalid Token");
+            }
+
+            int UserId = int.Parse(userIdClaim.Value);
+            return await _cartRepo.IncreaseQty(UserId, productId);
+        }
+
+        [HttpPost("DecreaseQuantity")]
+        public async Task<ResponseDto<object>> DecreaseQty(int productId)
+        {
+            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            if (userIdClaim == null)
+            {
+                return new ResponseDto<object>(null, "Unauthorized: User ID is not found.",401, "Invalid Token");
+            }
+            int UserId = int.Parse(userIdClaim.Value);
+            return await _cartRepo.DecreaseQty(UserId, productId);
+        }
+
+        [HttpDelete("RomeveAllItemsFromCart")]
+        public async Task<ResponseDto<object>> RemoveAllItems()
+        {
+            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            if (userIdClaim == null)
+            {
+                return new ResponseDto<object>(null, "Unauthorized: User ID is not found.", 401, "Invalid Token");
+            }
+            int UserId = int.Parse(userIdClaim.Value);
+            return await _cartRepo.RemoveAllItems(UserId);
+
+        }
+
     }
 
 }
