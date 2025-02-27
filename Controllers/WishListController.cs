@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pet_s_Land.DTOs;
 using Pet_s_Land.Models.ProductsModels;
 using Pet_s_Land.Repositories;
+using Pet_s_Land.Servies;
 
 namespace Pet_s_Land.Controllers
 {
@@ -11,49 +12,44 @@ namespace Pet_s_Land.Controllers
     [ApiController]
     public class WishListController : ControllerBase
     {
-        private readonly IWishListRep _wishListRep;
+        private readonly IWishListServices _wishListServices;
 
-        public WishListController(IWishListRep wishListRep)
+        public WishListController(IWishListServices wishListServices)
         {
-            _wishListRep = wishListRep;
+            _wishListServices = wishListServices;
         }
 
         [HttpPost("AddOrRemoveFrom WishList")]
-        public async Task<ResponseDto<object>> AddOrRemoveFromWishlist(int ProductId)
+        public async Task<ActionResult> AddOrRemoveFromWishlist(int ProductId)
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
 
             if (userIdClaim == null)
             {
-                return new ResponseDto<object>(null, "Unauthorized: User ID not found.", 401, "Invalid Token");
+                return  BadRequest( new ResponseDto<object>(null, "Unauthorized: User ID not found.", 401, "Invalid Token"));
             }
 
             int userId = int.Parse(userIdClaim.Value);
+            var result = await _wishListServices.AddorRemove(userId, ProductId);
 
-            return await _wishListRep.AddorRemove(userId, ProductId);
+
+            return StatusCode(result.StatusCode,result);
         }
 
 
         [HttpGet("GetWishList")]
-        public async Task<ResponseDto<List<WishListResDto>>> GetWishlist()
+        public async Task<ActionResult> GetWishlist()
         {
-            // Extract UserId from JWT token
             var userIdClaim = HttpContext.User.FindFirst("UserId");
 
-            // Check if UserId exists
             if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
             {
-                return new ResponseDto<List<WishListResDto>>(null, "Unauthorized: User ID not found.", 401);
+                return BadRequest( new ResponseDto<List<WishListResDto>>(null, "Unauthorized: User ID not found.", 401));
             }
+            int userId = int.Parse(userIdClaim.Value);
+            var result = await _wishListServices.GetWishList(userId);
 
-            // Convert UserId to int
-            if (!int.TryParse(userIdClaim.Value, out int userId))
-            {
-                return new ResponseDto<List<WishListResDto>>(null, "Invalid User ID format.", 400);
-            }
-
-            // Call repository method
-            return await _wishListRep.GetWishList(userId);
+            return StatusCode(result.StatusCode,result);
         }
 
     }

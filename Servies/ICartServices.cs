@@ -19,12 +19,10 @@ namespace Pet_s_Land.Servies
     public class CartServices: ICartServices
     {
         private readonly ICartRepo _cartRepo;
-        private readonly IMapper _mapper;
 
-        public CartServices(ICartRepo cartRepo, IMapper mapper)
+        public CartServices(ICartRepo cartRepo)
         {
             _cartRepo = cartRepo;
-            _mapper = mapper;
         }
 
             public async Task<ResponseDto<object>> AddToCart(int userId, int productId)

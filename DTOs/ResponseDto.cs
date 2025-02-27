@@ -2,7 +2,6 @@
 {
     public class ResponseDto<T>
     {
-        internal int stausCode;
 
         public T Data { get; set; }
         public string Message { get; set; }

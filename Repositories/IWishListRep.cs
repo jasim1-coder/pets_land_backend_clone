@@ -79,7 +79,7 @@ namespace Pet_s_Land.Repositories
                         Name = w.Products.Name,
                         Price = w.Products.Price,
                         Image = w.Products.Image,
-                        Category = w.Products.Category,
+                        Category = w.Products.Category.CategoryName,
                         Description = w.Products.Description
                     })
                     .ToListAsync();

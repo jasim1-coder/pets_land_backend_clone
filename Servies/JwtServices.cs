@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 public class JwtService
@@ -28,16 +29,26 @@ public class JwtService
             issuer: _configuration["JwtSettings:Issuer"],
             audience: _configuration["JwtSettings:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(GetTokenExpiryMinutes()), // Use helper method
+            expires: DateTime.UtcNow.AddMinutes(GetTokenExpiryMinutes()), 
             signingCredentials: credentials
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    // ✅ NEW: Helper method to access expiry time
+
+    public string GenerateRefreshToken()
+    {
+        var randomBytes = new byte[64];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(randomBytes);
+        }
+        return Convert.ToBase64String(randomBytes);
+    }
+
     public double GetTokenExpiryMinutes()
     {
-        return Convert.ToDouble(_configuration["JwtSettings:ExpiryMinutes"]);
+        return Convert.ToDouble(_configuration["JwtSettings:ExpirationMinutes"]);
     }
 }

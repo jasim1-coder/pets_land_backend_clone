@@ -1,0 +1,14 @@
+﻿namespace Pet_s_Land.DTOs
+{
+    public class ViewOrderUserDetailDto
+    {
+        public int Id { get; set; }
+        public DateTime OrderDate { get; set; }
+        public string OrderStatus { get; set; }
+        public string TransactionId { get; set; }
+        public decimal TotalPrice { get; set; }  
+
+        public List<ViewOrderDto> OrderProducts { get; set; }  
+    }
+
+}

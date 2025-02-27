@@ -135,10 +135,17 @@ namespace Pet_s_Land.Repositories
                         cartItemsperUser = cartitem
                     };
 
-                    return new ResponseDto<CartResDto>(result, "", 200);
+                    return new ResponseDto<CartResDto>(result, "Cart retrived successfully", 200);
                 }
+                var Noresult = new CartResDto
+                {
+                    TotalItem = 0,
+                    TotalPrice = 0,
+                    cartItemsperUser = []
 
-                return new ResponseDto<CartResDto>(null, "Cart not found", 404);
+                };
+
+                return new ResponseDto<CartResDto>(Noresult, "No itmes in cart.", 404);
             }
             catch (Exception ex)
             {

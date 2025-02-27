@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Pet_s_Land.Datas;
 using Pet_s_Land.DTOs;
 using Pet_s_Land.Models.ProductsModels;
+
 using Pet_s_Land.Services;
 using System.Threading.Tasks;
 
@@ -10,13 +11,15 @@ namespace Pet_s_Land.Repositories
 {
     public interface IProductsRepo
     {
-        Task<ResponseDto<object>> AddProductAsync(ProductDto productData);
-        Task<ResponseDto<List<Product>>> GetAllProductsAsync();
+        Task<ResponseDto<AddProductRes>> AddProductAsync(AddProductDto productData);
+        Task<ResponseDto<List<ProductSearchDto>>> GetAllProductsAsync();
 
-        Task<ResponseDto<Product>> GetProductByIdAsync(int Id);
-        Task<ResponseDto<List<Product>>> GetProductByCategryAsync(string Category);
+        Task<ResponseDto<ProductDto>> GetProductByIdAsync(int Id);
+        Task<ResponseDto<List<ProductDto>>> GetProductByCategryAsync(int CategoryId);
 
-        Task<ResponseDto<List<Product>>> GetProductsByPaginatedAsync(int pageNum, int pageSize);
+        Task<ResponseDto<List<ProductDto>>> GetProductsByPaginatedAsync(int pageNum, int pageSize);
+
+        Task<ResponseDto<List<ProductSearchDto>>> SearchProductsAsync(string searchTerm);
 
 
     }
@@ -34,107 +37,153 @@ namespace Pet_s_Land.Repositories
             _cloudinaryService = cloudinaryService;
         }
 
-        public async Task<ResponseDto<object>> AddProductAsync(ProductDto productData)
+        public async Task<ResponseDto<AddProductRes>> AddProductAsync(AddProductDto productData)
         {
-            // Upload the image using CloudinaryService
-            var imageUrl = await _cloudinaryService.UploadImageAsync(productData.Image);
-
-
-            if (string.IsNullOrEmpty(imageUrl))
+            try
             {
-                return new ResponseDto<object>(productData, "Image upload failed", 500);
-            }
-
-            var product = _mapper.Map<Product>(productData);
-
-
-            product.Image = imageUrl;
-
-            _appDbContext.Products.Add(product);
-            await _appDbContext.SaveChangesAsync();
-
-            return new ResponseDto<object>(productData, "Product added successfully", 200);
-        }
-
-        public async Task<ResponseDto<List<Product>>> GetAllProductsAsync()
-        {
-            var result = await _appDbContext.Products.ToListAsync();
-            if (result.Count > 0)
-            {
-                return new ResponseDto<List<Product>>(result, "List of all Products", 200);
-            }
-            else
-            {
-                return new ResponseDto<List<Product>>(null, "No items in Table", 404);
-            }
-
-        }
-
-        public async Task<ResponseDto<Product>> GetProductByIdAsync(int Id)
-        {
-
-            var result = await _appDbContext.Products.FirstOrDefaultAsync(product => product.Id == Id);
-
-            if (result != null)
-            {
-                return new ResponseDto<Product>(result, "Product by Id", 200);
-            }
-            else
-            {
-                return new ResponseDto<Product>(null, "No item wtih such Id in Table", 404);
-            }
-
-        }
-
-
-        public async Task<ResponseDto<List<Product>>> GetProductByCategryAsync(string Category)
-        {
-            var result = await _appDbContext.Products.Where(product => product.Category.ToLower() == Category.ToLower()).ToListAsync();
-            if (result != null)
-            {
-                return new ResponseDto<List<Product>>(result, "List of product in this category", 200);
-            }
-            else
-            {
-                return new ResponseDto<List<Product>>(null, "No items in such category", 404);
-            }
-        }
-
-
-
-        public async Task<ResponseDto<List<Product>>> GetProductsByPaginatedAsync(int pageNum, int pageSize)
-        {
-            var skip = (pageNum - 1) * pageSize;
-
-            var result = await _appDbContext.Products.Skip(skip).Take(pageSize).ToListAsync();
-            //var totalItems = await _appDbContext.Products.CountAsync();
-            //var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
-
-            if (result.Count > 0)
-            {
-                //var paginationInfo = new
-                //{
-                //    PageNumber = pageNumber,
-                //    PageSize = pageSize,
-                //    TotalItems = totalItems,
-                //    TotalPages = totalPages
-                //};
-                
-
-                    return new ResponseDto<List<Product>>(result, "List of products", 200);
-
-                }
-
-
-                 else
+                var imageUrl = await _cloudinaryService.UploadImageAsync(productData.Image);
+                if (string.IsNullOrEmpty(imageUrl))
                 {
-                    return new ResponseDto<List<Product>>(null, "No products found", 404);
+                    return new ResponseDto<AddProductRes>(null, "Image upload failed", 500);
                 }
 
+                var product = _mapper.Map<Product>(productData);
+                product.Image = imageUrl;
+                _appDbContext.Products.Add(product);
+                await _appDbContext.SaveChangesAsync();
+
+                var resProduct = _mapper.Map<AddProductRes>(product);
+                return new ResponseDto<AddProductRes>(resProduct, "Product added successfully", 200);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<AddProductRes>(null, ex.Message, 500);
+            }
+        }
+
+        public async Task<ResponseDto<List<ProductSearchDto>>> GetAllProductsAsync()
+        {
+            try
+            {
+                var products = await _appDbContext.Products
+                    .Select(p => new ProductSearchDto
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Price = p.Price,
+                        ImageUrl = p.Image,
+                        Category = p.Category.CategoryName,
+                        Seller = p.Seller,
+                        Stock = p.Stock,
+                        Description = p.Description,
+                        Ingredients = p.Ingredients // Include Ingredients
+                    })
+                    .ToListAsync();
+
+                return products.Any()
+                    ? new ResponseDto<List<ProductSearchDto>>(products, "Success", 200)
+                    : new ResponseDto<List<ProductSearchDto>>(null, "No products available", 404);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<List<ProductSearchDto>>(null, ex.Message, 500);
+            } 
+        }
+
+
+        public async Task<ResponseDto<ProductDto>> GetProductByIdAsync(int Id)
+        {
+            try
+            {
+                var product = await _appDbContext.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == Id);
+                var resultproduct = _mapper.Map<ProductDto>(product);
+                return resultproduct != null
+                    ? new ResponseDto<ProductDto>(resultproduct, "Product retrieved successfully", 200)
+                    : new ResponseDto<ProductDto>(null, "No item with such Id in Table", 404);
+            }
+            catch (Exception ex) 
+            {
+                return new ResponseDto<ProductDto>(null, ex.Message, 500);
 
             }
-
-
-
         }
-    } 
+
+
+        public async Task<ResponseDto<List<ProductDto>>> GetProductByCategryAsync(int CategoryId)
+        {
+            try
+            {
+                var products = await _appDbContext.Products.Include(p => p.Category)
+                    .Where(p => p.Category.CategoryId == CategoryId)
+                    .Select(p => _mapper.Map<ProductDto>(p))
+                    .ToListAsync();
+
+                return products.Any()
+                    ? new ResponseDto<List<ProductDto>>(products, "List of products in this category", 200)
+                    : new ResponseDto<List<ProductDto>>(null, "No items in such category", 404);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<List<ProductDto>>(null, ex.Message, 500);
+            }
+        }
+
+
+
+        public async Task<ResponseDto<List<ProductDto>>> GetProductsByPaginatedAsync(int pageNum, int pageSize)
+        {
+            try
+            {
+                var skip = (pageNum - 1) * pageSize;
+                var products = await _appDbContext.Products.Include(p => p.Category).Skip(skip).Take(pageSize).ToListAsync();
+
+                var productDtos = _mapper.Map<List<ProductDto>>(products); 
+
+
+                return productDtos.Any()
+                    ? new ResponseDto<List<ProductDto>>(productDtos, "List of products", 200)
+                    : new ResponseDto<List<ProductDto>>(null, "No products found", 404);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<List<ProductDto>>(null, ex.Message, 500);
+            }
+        }
+        public async Task<ResponseDto<List<ProductSearchDto>>> SearchProductsAsync(string searchTerm)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    return new ResponseDto<List<ProductSearchDto>>(null, "Search term cannot be empty", 400);
+                }
+
+                var products = await _appDbContext.Products
+                    .Where(p => p.Name.Contains(searchTerm) || p.Category.CategoryName.Contains(searchTerm))
+                    .Select(p => new ProductSearchDto
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Price = p.Price,
+                        ImageUrl = p.Image,
+                        Category = p.Category.CategoryName,
+                        Seller = p.Seller,
+                        Stock = p.Stock,
+                        Description = p.Description,
+                        Ingredients = p.Ingredients
+                    })
+                    .ToListAsync();
+
+
+                return products.Any()
+                    ? new ResponseDto<List<ProductSearchDto>>(products, "Success", 200)
+                    : new ResponseDto<List<ProductSearchDto>>(null, "No products found", 404);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<List<ProductSearchDto>>(null, ex.Message, 500);
+            }
+        }
+
+    }
+} 

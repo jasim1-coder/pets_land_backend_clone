@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Pet_s_Land.DTOs;
@@ -13,70 +14,61 @@ namespace Pet_s_Land.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductsRepo _productsRepo;
         private readonly IProductsServices _productsServices;
-        private readonly IMapper _mapper;
-        private readonly ICloudinaryService _cloudinaryService;
 
-        public ProductsController(
-            IProductsRepo productsRepo,
-            IProductsServices productsServices,
-            IMapper mapper,
-            ICloudinaryService cloudinaryService)
+        public ProductsController(IProductsServices productsServices)
         {
-            _productsRepo = productsRepo;
             _productsServices = productsServices;
-            _mapper = mapper;
-            _cloudinaryService = cloudinaryService;
         }
 
+
+        [Authorize(Roles = "Admin")]
+
         [HttpPost("add")]
-        public async Task<IActionResult> AddProduct([FromForm] ProductDto productData)
+        public async Task<IActionResult> AddProduct(AddProductDto productData)
         {
             if (productData.Image == null || productData.Image.Length == 0)
             {
                 return BadRequest(new { message = "No image uploaded." });
             }
 
-            // Upload image to Cloudinary
-            var imageUrl = await _cloudinaryService.UploadImageAsync(productData.Image);
-
-            // Mapping product data from DTO to Model
-            var product = _mapper.Map<Product>(productData);
-            product.Image = imageUrl; // Store Cloudinary URL in the database
-
-            // Save product to database through the service
-            var result = await _productsRepo.AddProductAsync(productData);
-
-            return Ok(new { message = "Product added successfully", product = result });
+            var result = await _productsServices.AddProductAsync(productData);
+            return StatusCode(result.StatusCode, result);
         }
 
-        [HttpGet("Get all product")]
-        public async Task<ResponseDto<List<Product>>> GetAllProductsAsync()
+        [HttpGet("GetAllProducts")]
+        public async Task<IActionResult> GetAllProductsAsync()
         {
-            return await _productsRepo.GetAllProductsAsync();
-            
-            //return StatusCode(result.StatusCode,result);
-           
+            var result = await _productsServices.GetAllProductsAsync();
+            return StatusCode(result.StatusCode, result);
         }
 
-        [HttpGet("Get Product By Id")]
-        public async Task<ResponseDto<Product>> GetProductByIdAsync(int Id)
+        [HttpGet("GetProductById")]
+        public async Task<IActionResult> GetProductByIdAsync(int Id)
         {
-            return await _productsRepo.GetProductByIdAsync(Id);
+            var result = await _productsServices.GetProductByIdAsync(Id);
+            return StatusCode(result.StatusCode, result);
         }
 
-        [HttpGet("Get Product By Category")]
-        public async Task<ResponseDto<List<Product>>> GetProductByCategoryAsync(string Category)
+        [HttpGet("GetProductByCategory")]
+        public async Task<IActionResult> GetProductByCategryAsync(int CategoryId)
         {
-            return await _productsRepo.GetProductByCategryAsync(Category);
+            var result = await _productsServices.GetProductByCategryAsync(CategoryId);
+            return StatusCode(result.StatusCode, result);
         }
 
-        [HttpGet("Get Product Paginated")]
-        public async Task<ResponseDto<List<Product>>> GetProductPaginatedAsync(int pageNum, int pageSize)
+        [HttpGet("GetProductPaginated")]
+        public async Task<IActionResult> GetProductPaginatedAsync(int pageNum, int pageSize)
         {
-            return await _productsRepo.GetProductsByPaginatedAsync(pageNum, pageSize);
+            var result = await _productsServices.GetProductsByPaginatedAsync(pageNum, pageSize);
+            return StatusCode(result.StatusCode, result);
+        }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProducts([FromQuery] string query)
+        {
+            var response = await _productsServices.SearchProductsAsync(query);
+            return StatusCode(response.StatusCode, response);
         }
 
     }

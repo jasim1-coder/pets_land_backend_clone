@@ -1,6 +1,8 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Pet_s_Land.Models.CartModels;
+using Pet_s_Land.Models.CategoryModels;
 
 namespace Pet_s_Land.Models.ProductsModels
 {
@@ -11,15 +13,17 @@ namespace Pet_s_Land.Models.ProductsModels
 
         public string Name { get; set; }
         [Range(0, double.MaxValue, ErrorMessage = "Price must be greater than or equal to 0")]
+        [Column(TypeName = "decimal(18,2)")]
 
         public decimal Price { get; set; }
         [Range(0, double.MaxValue, ErrorMessage = "Old Price must be greater than or equal to 0")]
+        [Column(TypeName = "decimal(18,2)")]
 
         public decimal OldPrice { get; set; }
         public string Image { get; set; }
-        [Required]
 
-        public string Category { get; set; }
+
+        public int? CategoryId { get; set; }
         [Required]
 
 
@@ -32,6 +36,8 @@ namespace Pet_s_Land.Models.ProductsModels
         public string Description { get; set; }
         public List<string> Ingredients { get; set; }
         public virtual List<CartItem> CartItems { get; set; }
+        public virtual Category? Category { get; set; }
+
 
 
     }

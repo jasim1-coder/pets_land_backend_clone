@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
+using Pet_s_Land.Models.AdressModels;
 using Pet_s_Land.Models.CartModels;
+using Pet_s_Land.Models.OrderModels;
 using Pet_s_Land.Models.WhishlistModel;
 
 namespace Pet_s_Land.Models.UserModels
@@ -27,12 +29,15 @@ namespace Pet_s_Land.Models.UserModels
         public string Password { get; set; }
 
         public string? Role { get; set; } = "User";
-        //public bool IsBlocked { get; set; }
+        public bool IsBlocked { get; set; }
+
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiry { get; set; }
         public virtual Cart? Cart { get; set; }
 
-        //public virtual List<OrderMain> Orders { get; set; }
+        public virtual List<Order> Orders { get; set; }
         public List<WishList> WishList { get; set; }
 
-        //public ICollection<Address> Addresses { get; set; }
+        public ICollection<Address> Addresses { get; set; }
     }
 }

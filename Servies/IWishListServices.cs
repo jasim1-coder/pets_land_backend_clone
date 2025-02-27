@@ -14,19 +14,17 @@ namespace Pet_s_Land.Servies
     public class WishListServices : IWishListServices
     {
         private readonly IWishListRep _wishListRep;
-        private readonly IMapper _mapper;
 
-        public WishListServices(IWishListRep wishListRep, IMapper mapper)
+        public WishListServices(IWishListRep wishListRep)
         {
-            wishListRep = _wishListRep;
-            mapper = _mapper;
+            _wishListRep = wishListRep;
+            
         }
 
-
-            public async Task<ResponseDto<object>> AddorRemove(int userId, int productId)
-             {
-            return await _wishListRep.AddorRemove(userId, productId);
-             }
+         public async Task<ResponseDto<object>> AddorRemove(int userId, int productId)
+          {
+          return await _wishListRep.AddorRemove(userId, productId);
+          }
             
         public async Task<ResponseDto<List<WishListResDto>>> GetWishList(int userId)
 
@@ -34,10 +32,6 @@ namespace Pet_s_Land.Servies
             return await _wishListRep.GetWishList(userId);
 
         }
-
-
-
-
 
     }
 }

@@ -354,3 +354,5 @@ C:\Users\jasim\OneDrive\Desktop\Pet's Land Ecommerce .Net\Pets_Land\bin\Debug\ne
 C:\Users\jasim\OneDrive\Desktop\Pet's Land Ecommerce .Net\Pets_Land\bin\Debug\net8.0\Microsoft.Bcl.Memory.dll
 C:\Users\jasim\OneDrive\Desktop\Pet's Land Ecommerce .Net\Pets_Land\bin\Debug\net8.0\CloudinaryDotNet.dll
 C:\Users\jasim\OneDrive\Desktop\Pet's Land Ecommerce .Net\Pets_Land\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\jasim\OneDrive\Desktop\Pet's Land Ecommerce .Net\Pets_Land\bin\Debug\net8.0\BouncyCastle.Crypto.dll
+C:\Users\jasim\OneDrive\Desktop\Pet's Land Ecommerce .Net\Pets_Land\bin\Debug\net8.0\Razorpay.dll

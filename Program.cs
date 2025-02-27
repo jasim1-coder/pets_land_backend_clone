@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Pet_s_Land.Datas;
 using Pet_s_Land.Mapping;
+using Pet_s_Land.Middlewares;
 using Pet_s_Land.Repositories;
 using Pet_s_Land.Services;
 using Pet_s_Land.Servies;
@@ -18,21 +19,18 @@ namespace Pet_s_Land
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Load JWT Secret Key from configuration
-            var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key is missing."));
+            // Load JWT Secret Key
+            var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]
+                ?? throw new InvalidOperationException("JWT Secret Key is missing."));
 
-            // Cloudinary Configuration
-            builder.Services.AddSingleton<ICloudinaryService, CloudinaryService>();
-
-
-
-            // Add services to the container
+            // Add services
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-            builder.Services.AddScoped<IRegisterUser, RegisterUsers>();
+            // Register Services & Repositories
+            builder.Services.AddScoped<IUserServices, RegisterUsers>();
             builder.Services.AddScoped<IUserRepoRegister, UserRepoRegister>();
             builder.Services.AddScoped<IProductsServices, ProductsServices>();
             builder.Services.AddScoped<IProductsRepo, ProductsRepo>();
@@ -40,13 +38,20 @@ namespace Pet_s_Land
             builder.Services.AddScoped<IWishListRep, WishListRep>();
             builder.Services.AddScoped<ICartServices, CartServices>();
             builder.Services.AddScoped<ICartRepo, CartRepo>();
-            builder.Services.AddScoped<JwtService>(); // Register JWT Service
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IPaymentRepo, PaymentRepo>();
+            builder.Services.AddScoped<IAddressService, AddressService>();
+            builder.Services.AddScoped<IAddressRepo, AddressRepo>();
+            builder.Services.AddScoped<IAdminServices, AdminServices>();
+            builder.Services.AddScoped<IAdminRepo, AdminRepo>();
+            builder.Services.AddScoped<JwtService>();
+            builder.Services.AddSingleton<ICloudinaryService, CloudinaryService>(); // Cloudinary
 
             // Configure JWT Authentication
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    options.RequireHttpsMetadata = false; // Set this to true in production
+                    options.RequireHttpsMetadata = false;
                     options.SaveToken = true;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -56,52 +61,54 @@ namespace Pet_s_Land
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
                         ValidAudience = builder.Configuration["JwtSettings:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(key)
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ClockSkew = TimeSpan.Zero
                     };
                 });
 
-            builder.Services.AddAuthorization();
+            // Authorization Policies
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+            });
 
+            // Swagger Configuration
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
-                // Define security scheme for JWT
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "Enter 'Bearer {your JWT token}' in the input field below.\n\nExample: Bearer eyJhbGciOiJI...",
+                    Description = "Enter 'Bearer {your JWT token}' below.\n\nExample: Bearer eyJhbGciOiJI...",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
                     Scheme = "Bearer"
                 });
 
-                // Apply security requirements globally
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new List<string>()
-        }
-    });
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new List<string>()
+                    }
+                });
             });
 
             builder.Services.AddControllers();
-
-            // Swagger setup
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Middleware Pipeline
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -109,11 +116,9 @@ namespace Pet_s_Land
             }
 
             app.UseHttpsRedirection();
-
-            // Authentication should come before Authorization
+            app.UseMiddleware<CustomAuthMiddleware>(); // Custom Auth Middleware
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
 
             app.Run();
