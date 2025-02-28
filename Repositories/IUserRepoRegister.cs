@@ -10,7 +10,7 @@ namespace Pet_s_Land.Repositories
 {
     public interface IUserRepoRegister
     {
-        Task<ResponseDto<object>> RegisterUser(UserDto userDto);
+        Task<ResponseDto<object>> RegisterUser(UserDto regdata);
         Task<ResponseDto<JwtResponseDto>> LoginUser(LoginRequestDto loginData);
         Task<ResponseDto<JwtResponseDto>> RefreshToken(string refreshToken);
 
@@ -35,20 +35,26 @@ namespace Pet_s_Land.Repositories
         {
             try
             {
-                bool existing = await _appDbContext.Users.AnyAsync(user => user.Email == regdata.Email || user.UserName == regdata.UserName);
+                // Ensure case-insensitive check
+                var user = await _appDbContext.Users
+                    .Where(u => u.Email.ToLower() == regdata.Email.ToLower() || u.UserName.ToLower() == regdata.UserName.ToLower())
+                    .FirstOrDefaultAsync();
 
-                if (existing)
+
+                if (user != null)
                 {
+                    Console.WriteLine($"Existing User: Email = {user.Email}, Name = {user.Name}");
                     return new ResponseDto<object>(null, "User already exists", 400, "Email or UserName is already taken.");
                 }
 
+                // Hash password before saving
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(regdata.Password);
-                var user = _mapper.Map<User>(regdata);
-                user.Password = hashedPassword;
-                await _appDbContext.Users.AddAsync(user);
+                var users = _mapper.Map<User>(regdata);
+                users.Password = hashedPassword;
+
+                await _appDbContext.Users.AddAsync(users);
                 await _appDbContext.SaveChangesAsync();
 
-                //var userDto = _mapper.Map<User>(user);
                 var result = new UserResDto
                 {
                     Name = regdata.Name,
@@ -57,15 +63,15 @@ namespace Pet_s_Land.Repositories
                     PhoneNo = regdata.PhoneNo,
                     Role = "User"
                 };
-                return new ResponseDto<object>(result, "User registered successfully", 201);
 
+                return new ResponseDto<object>(result, "User registered successfully", 201);
             }
             catch (Exception ex)
             {
                 return new ResponseDto<object>(null, "An error occurred", 500, ex.Message);
             }
-
         }
+
 
         public async Task<ResponseDto<JwtResponseDto>> LoginUser(LoginRequestDto loginData)
         {
@@ -90,7 +96,8 @@ namespace Pet_s_Land.Repositories
                 {
                     return new ResponseDto<JwtResponseDto>(null, "Invalid credentials", 400);
                 }
-
+                var Name = user.UserName;
+                var Id = user.Id;
                 var token = _jwtService.GenerateToken(user.UserName, user.Role, user.Id);
                 var refreshToken = _jwtService.GenerateRefreshToken();
                 var expiration = DateTime.UtcNow.AddMinutes(_jwtService.GetTokenExpiryMinutes());
@@ -109,7 +116,9 @@ namespace Pet_s_Land.Repositories
                 {
                     Token = token,
                     RefreshToken = refreshToken,
-                    Expiration = expiration
+                    Expiration = expiration,
+                    Name = Name,
+                    UserId = Id
                 };
 
                 return new ResponseDto<JwtResponseDto>(response, "Login successful", 200);

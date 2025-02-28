@@ -19,6 +19,18 @@ namespace Pet_s_Land
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReactApp",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:5173") // Change this to your frontend URL
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    });
+            });
+
+
             // Load JWT Secret Key
             var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]
                 ?? throw new InvalidOperationException("JWT Secret Key is missing."));
@@ -117,6 +129,8 @@ namespace Pet_s_Land
 
             app.UseHttpsRedirection();
             app.UseMiddleware<CustomAuthMiddleware>(); // Custom Auth Middleware
+            app.UseCors("AllowReactApp"); // Apply CORS
+
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();

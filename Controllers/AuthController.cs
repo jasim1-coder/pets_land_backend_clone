@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pet_s_Land.DTOs;
-using Pet_s_Land.Repositories;
 using Pet_s_Land.Servies;
 
 [Route("api/auth")]
@@ -23,13 +22,13 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("SignUp")]
-    public async Task<ActionResult> RegisterUser(UserDto newUser)
+    public async Task<IActionResult> RegisterUser(UserDto regdata)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(new ResponseDto<object>(null, "Invalid input data",400));
         }
-        var result = await _userServices.RegisterUser(newUser);
+        var result = await _userServices.RegisterUser(regdata);
 
         return StatusCode(result.StatusCode,result);
     }

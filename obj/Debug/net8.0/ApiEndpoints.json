@@ -231,7 +231,7 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "newUser",
+        "Name": "regdata",
         "Type": "Pet_s_Land.DTOs.UserDto",
         "IsRequired": true
       }

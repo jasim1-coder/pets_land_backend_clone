@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Pet_s_Land.DTOs;
-
-using Pet_s_Land.Repositories;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Pet_s_Land.Servies;
 
 namespace Pet_s_Land.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = "User,Admin")]
+
     [ApiController]
     public class CartController : ControllerBase
     {
@@ -22,12 +22,6 @@ namespace Pet_s_Land.Controllers
         public async Task<ActionResult> GetCartItems()
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
-
-            if (userIdClaim == null)
-            {
-                return BadRequest(new ResponseDto<bool>(false, "Unauthorized: User ID not found.", 401, "Invalid Token"));
-            }
-
             int UserId = int.Parse(userIdClaim.Value);
             var result = await _cartServices.GetCartItems(UserId);
 
@@ -38,11 +32,6 @@ namespace Pet_s_Land.Controllers
         public async Task<ActionResult> AddToCart(int productId)
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
-
-            if (userIdClaim == null)
-            {
-                return BadRequest(new ResponseDto<bool>(false, "Unauthorized: User ID not found.", 401, "Invalid Token"));
-            }
 
             int UserId = int.Parse(userIdClaim.Value);
             var result = await _cartServices.AddToCart(UserId, productId);
@@ -55,12 +44,6 @@ namespace Pet_s_Land.Controllers
         public async Task<ActionResult> RemoveFromCart(int productId)
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
-
-            if (userIdClaim == null)
-            {
-                return BadRequest(new ResponseDto<bool>(false, "Unauthorized: User ID not found.", 401, "Invalid Token"));
-            }
-
             int UserId = int.Parse(userIdClaim.Value);
             var result = await _cartServices.RemoveFromCart(UserId,productId);
 
@@ -71,12 +54,6 @@ namespace Pet_s_Land.Controllers
         public async Task<ActionResult> IncreaseQty(int productId)
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
-
-            if (userIdClaim == null)
-            {
-                return BadRequest(new ResponseDto<bool>(false, "Unauthorized: User ID not found.", 401, "Invalid Token"));
-            }
-
             int UserId = int.Parse(userIdClaim.Value);
             var result = await _cartServices.IncreaseQty(UserId,productId);
             return StatusCode(result.StatusCode,result);
@@ -86,10 +63,6 @@ namespace Pet_s_Land.Controllers
         public async Task<ActionResult> DecreaseQty(int productId)
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
-            if (userIdClaim == null)
-            {
-                return BadRequest(new ResponseDto<bool>(false, "Unauthorized: User ID not found.", 401, "Invalid Token"));
-            }
             int UserId = int.Parse(userIdClaim.Value);
             var result = await _cartServices.DecreaseQty(UserId,productId);
             return StatusCode(result.StatusCode,result);
@@ -99,10 +72,6 @@ namespace Pet_s_Land.Controllers
         public async Task<ActionResult> RemoveAllItems()
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
-            if (userIdClaim == null)
-            {
-                return BadRequest(new ResponseDto<bool>(false, "Unauthorized: User ID not found.", 401, "Invalid Token"));
-            }
             int UserId = int.Parse(userIdClaim.Value);
             var result = await _cartServices.RemoveAllItems(UserId);
             return StatusCode(result.StatusCode,result);

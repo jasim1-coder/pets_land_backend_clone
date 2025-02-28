@@ -24,8 +24,8 @@ namespace Pet_s_Land.Repositories
     public class PaymentRepo : IPaymentRepo
     {
         private readonly AppDbContext _appDbContext;
-        private const string RazorpayKey = "rzp_test_GUy7a9DJRctRKd";
-        private const string RazorpaySecret = "r1bwmkazKX1uPOnCC95vcRuu";
+        private const string RazorpayKey = "";
+        private const string RazorpaySecret = "";
 
         public PaymentRepo(AppDbContext appDbContext)
         {
@@ -249,12 +249,10 @@ namespace Pet_s_Land.Repositories
                         Image = oi.Product.Image,
                         TotalAmount = oi.TotalPrice,
                         Quantity = oi.Quantity,
-                        //OrderStatus = order.OrderStatus.ToString(),
-                        //OrderDate = order.OrderDate
                     }).ToList() 
                 }).ToList(); 
 
-                return new ResponseDto<List<ViewOrderUserDetailDto>>(orderDtos, "Success", 200);
+                return new ResponseDto<List<ViewOrderUserDetailDto>>(orderDtos, "Order details retrieved successfully", 200);
             }
             catch (Exception ex)
             {
