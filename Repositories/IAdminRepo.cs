@@ -22,6 +22,8 @@ namespace Pet_s_Land.Repositories
         Task<ResponseDto<decimal>> GetTotalRevenue();
 
         Task<ResponseDto<List<OrderDto>>> GetAllOrdersWithItems();
+        Task<ResponseDto<List<OrderDto>>> GetUserOrders(int userId);
+
 
         Task<ResponseDto<string>> DeleteProduct(int productId);
 
@@ -224,6 +226,58 @@ namespace Pet_s_Land.Repositories
         //        return new ResponseDto<string>(null, "Error deleting product: " + ex.Message, 500);
         //    }
         //}
+
+
+        public async Task<ResponseDto<List<OrderDto>>> GetUserOrders(int userId)
+        {
+            try
+            {
+                if (userId <= 0)
+                {
+                    return new ResponseDto<List<OrderDto>>(null, "Invalid user ID.", 400);
+                }
+                var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                if (user == null)
+                {
+                    return new ResponseDto<List<OrderDto>>(null, "No users found", 400);
+                }
+
+                var userOrders = await _appDbContext.Orders
+                    .Where(o => o.UserId == userId)
+                    .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product) // Ensuring Product details are included
+                    .Select(o => new OrderDto
+                    {
+                        Id = o.Id,
+                        OrderDate = o.OrderDate,
+                        TotalAmount = o.TotalAmount,
+                        OrderStatus = o.OrderStatus,
+                        CustomerName = o.User.Name,
+                        PhoneNumber = o.User.PhoneNumber,
+                        OrderItems = o.OrderItems.Select(oi => new OrderItemDto
+                        {
+                            ProductName = oi.Product.Name,
+                            ProductImage = oi.Product.Image,
+                            Quantity = oi.Quantity
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                if (userOrders == null || userOrders.Count == 0)
+                {
+                    return new ResponseDto<List<OrderDto>>(null, "No orders found for the user.", 404);
+                }
+
+                return new ResponseDto<List<OrderDto>>(userOrders, "Orders fetched successfully.", 200);
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError($"Error retrieving user orders: {ex.Message}");
+                return new ResponseDto<List<OrderDto>>(null, "An error occurred while fetching orders.", 500);
+            }
+
+        }
+
 
 
         public async Task<ResponseDto<string>> DeleteProduct(int productId)

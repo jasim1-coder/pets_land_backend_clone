@@ -191,6 +191,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Pet_s_Land.Controllers.AdminController",
+    "Method": "GetUserOrders",
+    "RelativePath": "api/Admin/User-Order",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "AuthController",
     "Method": "Login",
     "RelativePath": "api/auth/login",

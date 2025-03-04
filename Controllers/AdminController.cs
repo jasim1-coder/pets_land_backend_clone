@@ -67,6 +67,31 @@ namespace Pet_s_Land.Controllers
         }
 
 
+
+        //[HttpGet("{userId}/orders")]
+        //public async Task<IActionResult> GetUserOrders(int userId)
+        //{
+        //    try
+        //    {
+        //        var response = await _orderService.GetUserOrders(userId);
+        //        return StatusCode(response.StatusCode, response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError($"Error in GetUserOrders API: {ex.Message}");
+        //        return StatusCode(500, new ResponseDto<string>(null, "Internal server error while fetching user orders.", 500));
+        //    }
+        //}
+
+
+        [HttpGet("User-Order")]
+        public async Task<IActionResult> GetUserOrders(int userId)
+        {
+            var respnse = await _adminServices.GetUserOrders(userId);
+            return StatusCode(Response.StatusCode, respnse);
+        }
+
+
         [HttpDelete("DeleteProduct/{productId}")]
         public async Task<IActionResult> DeleteProduct(int productId)
         {

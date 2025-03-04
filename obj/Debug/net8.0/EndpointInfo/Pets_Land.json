@@ -162,6 +162,28 @@
         }
       }
     },
+    "/api/Admin/User-Order": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Admin/DeleteProduct/{productId}": {
       "delete": {
         "tags": [

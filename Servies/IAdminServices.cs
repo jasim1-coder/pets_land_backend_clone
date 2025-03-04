@@ -19,6 +19,8 @@ namespace Pet_s_Land.Servies
         Task<ResponseDto<decimal>> GetTotalRevenue();
 
         Task<ResponseDto<List<OrderDto>>> GetAllOrdersWithItems();
+        Task<ResponseDto<List<OrderDto>>> GetUserOrders(int userId);
+
 
         Task<ResponseDto<string>> DeleteProduct(int productId);
 
@@ -78,8 +80,14 @@ namespace Pet_s_Land.Servies
             return await _adminRepo.UpdateProductAsync(productId, productData);
 
         }
+         
+        public async Task<ResponseDto<List<OrderDto>>> GetUserOrders(int userId)
+        {
+            return await _adminRepo.GetUserOrders(userId);
 
-}
+        }
+
+    }
 
 
 }
