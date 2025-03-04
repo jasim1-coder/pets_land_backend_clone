@@ -162,7 +162,7 @@
         }
       }
     },
-    "/api/Admin/{productId}": {
+    "/api/Admin/DeleteProduct/{productId}": {
       "delete": {
         "tags": [
           "Admin"
@@ -210,9 +210,9 @@
                   "Description",
                   "Image",
                   "Ingredients",
+                  "MRP",
                   "Name",
-                  "OldPrice",
-                  "Price",
+                  "RP",
                   "Seller",
                   "Stock"
                 ],
@@ -228,12 +228,12 @@
                     "type": "integer",
                     "format": "int32"
                   },
-                  "Price": {
+                  "RP": {
                     "minimum": 0,
                     "type": "number",
                     "format": "double"
                   },
-                  "OldPrice": {
+                  "MRP": {
                     "minimum": 0,
                     "type": "number",
                     "format": "double"
@@ -269,10 +269,10 @@
                 "CategoryId": {
                   "style": "form"
                 },
-                "Price": {
+                "RP": {
                   "style": "form"
                 },
-                "OldPrice": {
+                "MRP": {
                   "style": "form"
                 },
                 "Stock": {
@@ -391,7 +391,7 @@
         }
       }
     },
-    "/api/Cart/GetCart Items": {
+    "/api/Cart/GetCartItems": {
       "get": {
         "tags": [
           "Cart"
@@ -713,7 +713,7 @@
             }
           },
           {
-            "name": "Price",
+            "name": "RP",
             "in": "query",
             "required": true,
             "schema": {
@@ -723,7 +723,7 @@
             }
           },
           {
-            "name": "OldPrice",
+            "name": "MRP",
             "in": "query",
             "required": true,
             "schema": {
@@ -1091,6 +1091,9 @@
         "additionalProperties": false
       },
       "UserDto": {
+        "required": [
+          "phoneNo"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -1102,8 +1105,8 @@
             "nullable": true
           },
           "phoneNo": {
-            "type": "integer",
-            "format": "int32"
+            "minLength": 1,
+            "type": "string"
           },
           "userName": {
             "type": "string",

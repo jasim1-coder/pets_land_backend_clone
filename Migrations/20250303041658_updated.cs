@@ -1,26 +1,25 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Pet_s_Land.Migrations
 {
     /// <inheritdoc />
-    public partial class refreshtokenadded : Migration
+    public partial class updated : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "RefreshToken",
-                table: "Users",
+                name: "ProductImage",
+                table: "OrderItems",
                 type: "nvarchar(max)",
                 nullable: true);
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "RefreshTokenExpiry",
-                table: "Users",
-                type: "datetime2",
+            migrationBuilder.AddColumn<string>(
+                name: "ProductName",
+                table: "OrderItems",
+                type: "nvarchar(max)",
                 nullable: true);
         }
 
@@ -28,12 +27,12 @@ namespace Pet_s_Land.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "RefreshToken",
-                table: "Users");
+                name: "ProductImage",
+                table: "OrderItems");
 
             migrationBuilder.DropColumn(
-                name: "RefreshTokenExpiry",
-                table: "Users");
+                name: "ProductName",
+                table: "OrderItems");
         }
     }
 }

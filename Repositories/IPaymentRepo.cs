@@ -125,7 +125,7 @@ namespace Pet_s_Land.Repositories
                     {
                         Id = c.ProductId,
                         Quantity = c.Quantity,
-                        TotalPrice = c.Quantity * c.Product.Price
+                        TotalPrice = c.Quantity * c.Product.RP
                     }).ToList(),
                 };
 
@@ -162,10 +162,11 @@ namespace Pet_s_Land.Repositories
             try
             {
                 var address = await _appDbContext.Addresses.Where(a => a.UserId == userId && a.AddressId == createOrderDTO.AddressId).FirstOrDefaultAsync();
-                if(address.UserId != userId)
-                {
-                    return new ResponseDto<bool>(false, "Address didnt match.", 400);
 
+
+                if (address == null)
+                {
+                    return new ResponseDto<bool>(false, "Address did not match.", 400);
                 }
                 var cart = await _appDbContext.Carts
                     .Include(c => c.CartItems)
@@ -174,6 +175,18 @@ namespace Pet_s_Land.Repositories
 
                 if (cart == null || !cart.CartItems.Any())
                     return new ResponseDto<bool>(false, "Cart is empty.", 400);
+
+
+                //  Calculate actual total price from cart items
+                decimal actualTotalPrice = cart.CartItems.Sum(item => item.Quantity * item.Product.RP);
+
+                //  Validate total price before proceeding
+                if (actualTotalPrice != createOrderDTO.TotalAmount)
+                {
+                    return new ResponseDto<bool>(false, "Total price mismatch. Please refresh and try again.", 400);
+                }
+
+
 
                 // Check stock availability and deduct stock
                 foreach (var item in cart.CartItems)
@@ -188,7 +201,7 @@ namespace Pet_s_Land.Repositories
                 {
                     UserId = userId,
                     AddressId = createOrderDTO.AddressId,
-                    TotalAmount = createOrderDTO.TotalAmount,
+                    TotalAmount = actualTotalPrice,
                     TransactionId = !string.IsNullOrEmpty(createOrderDTO.TransactionId) ? createOrderDTO.TransactionId : Guid.NewGuid().ToString(),
                     OrderDate = DateTime.UtcNow,
                     OrderStatus = "Pending"
@@ -202,8 +215,10 @@ namespace Pet_s_Land.Repositories
                 {
                     OrderId = order.Id,  
                     ProductId = item.ProductId,
+                    ProductName = item.Product?.Name ?? "Unknown Product", // Store name separately
+                    ProductImage = item.Product?.Image, // Store image separately
                     Quantity = item.Quantity,
-                    TotalPrice = item.Quantity * item.Product.Price
+                    TotalPrice = item.Quantity * item.Product.RP
                 }).ToList();
 
                 await _appDbContext.OrderItems.AddRangeAsync(orderItems);
@@ -218,6 +233,46 @@ namespace Pet_s_Land.Repositories
             }
         }
 
+        //public async Task<ResponseDto<List<ViewOrderUserDetailDto>>> GetUserOrders(int userId)
+        //{
+        //    try
+        //    {
+        //        var orders = await _appDbContext.Orders
+        //            .Where(o => o.UserId == userId)
+        //            .Include(o => o.OrderItems)
+        //            .ThenInclude(oi => oi.Product)
+        //            .ToListAsync();
+
+        //        if (orders == null || orders.Count == 0)
+        //        {
+        //            return new ResponseDto<List<ViewOrderUserDetailDto>>(null, "No orders found", 404);
+        //        }
+
+        //        var orderDtos = orders.Select(order => new ViewOrderUserDetailDto
+        //        {
+        //            Id = order.Id,
+        //            OrderDate = order.OrderDate,
+        //            OrderStatus = order.OrderStatus.ToString(),
+        //            TransactionId = order.TransactionId ?? "N/A",
+        //            TotalPrice = order.OrderItems.Sum(oi => oi.TotalPrice),
+
+        //            OrderProducts = order.OrderItems.Select(oi => new ViewOrderDto
+        //            {
+        //                Id = oi.ProductId ?? 0, // Ensures no null value
+        //                ProductName = oi.Product != null ? oi.Product.Name : "Deleted Product",
+        //                Image = oi.Product != null ? oi.Product.Image : "default-image.jpg",
+        //                TotalAmount = oi.TotalPrice,
+        //                Quantity = oi.Quantity,
+        //            }).ToList()
+        //        }).ToList(); // Converts IEnumerable to List
+
+        //        return new ResponseDto<List<ViewOrderUserDetailDto>>(orderDtos, "Order details retrieved successfully", 200);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ResponseDto<List<ViewOrderUserDetailDto>>(null, "Internal Server Error: " + ex.Message, 500);
+        //    }
+        //}
 
         public async Task<ResponseDto<List<ViewOrderUserDetailDto>>> GetUserOrders(int userId)
         {
@@ -226,7 +281,8 @@ namespace Pet_s_Land.Repositories
                 var orders = await _appDbContext.Orders
                     .Where(o => o.UserId == userId)
                     .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product) 
+                    .Include(o => o.User) // Include User to access Name
+                    .Include(o => o.Address) // Include Address to access details
                     .ToListAsync();
 
                 if (orders == null || orders.Count == 0)
@@ -242,24 +298,30 @@ namespace Pet_s_Land.Repositories
                     TransactionId = order.TransactionId ?? "N/A",
                     TotalPrice = order.OrderItems.Sum(oi => oi.TotalPrice),
 
+                    CustomerName = order.User?.Name ?? "Unknown", // Fetch from User
+                    PhoneNumber = order.Address?.PhoneNumber ?? "N/A", // Fetch from Address
+
+                    // Basic required address details
+                    AddressDetails = $"{order.Address?.HouseName}, {order.Address?.Place}, {order.Address?.PostOffice}",
+                    Pincode = order.Address?.Pincode ?? "N/A",
+
                     OrderProducts = order.OrderItems.Select(oi => new ViewOrderDto
                     {
-                        Id = oi.ProductId,
-                        ProductName = oi.Product.Name,
-                        Image = oi.Product.Image,
+                        Id = oi.ProductId ?? 0,
+                        ProductName = oi.ProductName,
+                        Image = oi.ProductImage,
                         TotalAmount = oi.TotalPrice,
                         Quantity = oi.Quantity,
-                    }).ToList() 
-                }).ToList(); 
+                    }).ToList()
+                }).ToList();
 
                 return new ResponseDto<List<ViewOrderUserDetailDto>>(orderDtos, "Order details retrieved successfully", 200);
             }
             catch (Exception ex)
             {
-                return new ResponseDto<List<ViewOrderUserDetailDto>>(null, "Internal Server Error", 500);
+                return new ResponseDto<List<ViewOrderUserDetailDto>>(null, "Internal Server Error: " + ex.Message, 500);
             }
         }
-
 
 
 

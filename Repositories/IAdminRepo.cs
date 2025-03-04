@@ -151,10 +151,10 @@ namespace Pet_s_Land.Repositories
             try
             {
                 var orders = await _appDbContext.Orders
+                    .AsNoTracking()
                     .Include(o => o.User)
                     .Include(o => o.Address)
                     .Include(o => o.OrderItems)
-                        .ThenInclude(oi => oi.Product)
                     .ToListAsync();
 
                 if (!orders.Any())
@@ -172,7 +172,8 @@ namespace Pet_s_Land.Repositories
                     PhoneNumber = order.Address.PhoneNumber,
                     OrderItems = order.OrderItems.Select(oi => new OrderItemDto
                     {
-                        ProductName = oi.Product.Name,
+                        ProductName = oi.ProductName,  //  Use stored product name from OrderItems
+                        ProductImage = oi.ProductImage, //  Use stored product image from OrderItems
                         Quantity = oi.Quantity
                     }).ToList()
                 }).ToList();
@@ -185,6 +186,46 @@ namespace Pet_s_Land.Repositories
             }
         }
 
+
+        //public async Task<ResponseDto<string>> DeleteProduct(int productId)
+        //{
+        //    try
+        //    {
+        //        var product = await _appDbContext.Products.FindAsync(productId);
+
+        //        if (product == null)
+        //        {
+        //            return new ResponseDto<string>(null, "Product not found.", 404);
+        //        }
+
+        //        // Remove product from cart and wishlist
+        //        var cartItems = _appDbContext.CartItems.Where(ci => ci.ProductId == productId);
+        //        var wishlistItems = _appDbContext.WishLists.Where(wl => wl.ProductId == productId);
+
+        //        _appDbContext.CartItems.RemoveRange(cartItems);
+        //        _appDbContext.WishLists.RemoveRange(wishlistItems);
+
+
+        //        product.IsDeleted = true;
+        //        await _appDbContext.SaveChangesAsync();
+
+        //        var orderItems = await _appDbContext.OrderItems.Where(oi => oi.ProductId == productId).ToListAsync();
+        //        foreach (var orderItem in orderItems)
+        //        {
+        //            orderItem.ProductId = null;
+        //        }
+
+        //        await _appDbContext.SaveChangesAsync();
+
+        //        return new ResponseDto<string>("Product soft deleted successfully, and removed from cart & wishlist.", "Success", 200);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ResponseDto<string>(null, "Error deleting product: " + ex.Message, 500);
+        //    }
+        //}
+
+
         public async Task<ResponseDto<string>> DeleteProduct(int productId)
         {
             try
@@ -196,8 +237,15 @@ namespace Pet_s_Land.Repositories
                     return new ResponseDto<string>(null, "Product not found.", 404);
                 }
 
+                // Remove related data (Cart, Wishlist, Orders)
+                _appDbContext.CartItems.RemoveRange(_appDbContext.CartItems.Where(ci => ci.ProductId == productId));
+                _appDbContext.WishLists.RemoveRange(_appDbContext.WishLists.Where(wl => wl.ProductId == productId));
+                //_appDbContext.OrderItems.RemoveRange(_appDbContext.OrderItems.Where(oi => oi.ProductId == productId));
+
+                // Remove product from database (🔥 Hard Delete)
                 _appDbContext.Products.Remove(product);
-                await _appDbContext.SaveChangesAsync();
+
+                await _appDbContext.SaveChangesAsync(); // Save changes
 
                 return new ResponseDto<string>("Product deleted successfully.", "Success", 200);
             }
@@ -206,6 +254,57 @@ namespace Pet_s_Land.Repositories
                 return new ResponseDto<string>(null, "Error deleting product: " + ex.Message, 500);
             }
         }
+
+
+
+        //public async Task<ResponseDto<AddProductRes>> UpdateProductAsync(int productId, AddProductDto productData)
+        //{
+        //    try
+        //    {
+        //        var existingProduct = await _appDbContext.Products.FindAsync(productId);
+        //        if (existingProduct == null)
+        //        {
+        //            return new ResponseDto<AddProductRes>(null, "Product not found", 404);
+        //        }
+
+
+        //        // ✅ Store old product name & image before updating
+        //        var oldProductName = existingProduct.Name;
+        //        var oldProductImage = existingProduct.Image;
+
+        //        // Check if a new image is uploaded
+        //        if (productData.Image != null && productData.Image.Length > 0)
+        //        {
+        //            var imageUrl = await _cloudinary.UploadImageAsync(productData.Image);
+        //            if (string.IsNullOrEmpty(imageUrl))
+        //            {
+        //                return new ResponseDto<AddProductRes>(null, "Image upload failed", 500);
+        //            }
+        //            existingProduct.Image = imageUrl;
+        //        }
+
+        //        // Update other product properties
+        //        existingProduct.Name = productData.Name;
+        //        existingProduct.Description = productData.Description;
+        //        existingProduct.RP = productData.RP;
+        //        existingProduct.MRP = productData.MRP;
+        //        existingProduct.Stock = productData.Stock;
+        //        existingProduct.CategoryId = productData.CategoryId;
+        //        existingProduct.Seller = productData.Seller;
+        //        existingProduct.Ingredients = productData.Ingredients;
+
+        //        _appDbContext.Products.Update(existingProduct);
+        //        await _appDbContext.SaveChangesAsync();
+
+        //        var resProduct = _mapper.Map<AddProductRes>(existingProduct);
+        //        return new ResponseDto<AddProductRes>(resProduct, "Product updated successfully", 200);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ResponseDto<AddProductRes>(null, ex.Message, 500);
+        //    }
+        //}
+
 
         public async Task<ResponseDto<AddProductRes>> UpdateProductAsync(int productId, AddProductDto productData)
         {
@@ -217,7 +316,9 @@ namespace Pet_s_Land.Repositories
                     return new ResponseDto<AddProductRes>(null, "Product not found", 404);
                 }
 
-                // Check if a new image is uploaded
+                // ✅ Store old product image (for reference, but do not update past orders)
+                var oldProductImage = existingProduct.Image;
+
                 if (productData.Image != null && productData.Image.Length > 0)
                 {
                     var imageUrl = await _cloudinary.UploadImageAsync(productData.Image);
@@ -228,11 +329,10 @@ namespace Pet_s_Land.Repositories
                     existingProduct.Image = imageUrl;
                 }
 
-                // Update other product properties
-                existingProduct.Name = productData.Name;
+                existingProduct.Name = productData.Name; // ✅ Update the product itself
                 existingProduct.Description = productData.Description;
-                existingProduct.Price = productData.Price;
-                existingProduct.OldPrice = productData.OldPrice;
+                existingProduct.RP = productData.RP;
+                existingProduct.MRP = productData.MRP;
                 existingProduct.Stock = productData.Stock;
                 existingProduct.CategoryId = productData.CategoryId;
                 existingProduct.Seller = productData.Seller;
@@ -246,7 +346,7 @@ namespace Pet_s_Land.Repositories
             }
             catch (Exception ex)
             {
-                return new ResponseDto<AddProductRes>(null, ex.Message, 500);
+                return new ResponseDto<AddProductRes>(null, "Error updating product: " + ex.Message, 500);
             }
         }
 

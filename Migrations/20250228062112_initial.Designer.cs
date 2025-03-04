@@ -12,8 +12,8 @@ using Pet_s_Land.Datas;
 namespace Pet_s_Land.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250225072654_refreshtokenadded")]
-    partial class refreshtokenadded
+    [Migration("20250228062112_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -243,14 +243,14 @@ namespace Pet_s_Land.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("MRP")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("OldPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Price")
+                    b.Property<decimal>("RP")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Seller")
@@ -292,8 +292,10 @@ namespace Pet_s_Land.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PhoneNo")
-                        .HasColumnType("int");
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("RefreshToken")
                         .HasColumnType("nvarchar(max)");

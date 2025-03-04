@@ -18,7 +18,7 @@ namespace Pet_s_Land.Controllers
             _cartServices = cartServices;
         }
 
-        [HttpGet("GetCart Items")]
+        [HttpGet("GetCartItems")]
         public async Task<ActionResult> GetCartItems()
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");

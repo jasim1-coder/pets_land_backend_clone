@@ -6,7 +6,7 @@ using Pet_s_Land.Servies;
 namespace Pet_s_Land.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User,Admin")]
 
     [ApiController]
     public class AddressController : ControllerBase

@@ -70,19 +70,24 @@ namespace Pet_s_Land.Repositories
             try
             {
                 var wishlistItems = await _appDbContext.WishLists
-                    .Where(w => w.UserId == userId)
+                    .Where(w => w.UserId == userId && w.Products != null && !w.Products.IsDeleted) // Exclude deleted products
                     .Include(w => w.Products)
                     .Select(w => new WishListResDto
                     {
                         Id = w.Id,
                         ProductId = w.ProductId,
                         Name = w.Products.Name,
-                        Price = w.Products.Price,
+                        Price = w.Products.RP,
                         Image = w.Products.Image,
                         Category = w.Products.Category.CategoryName,
                         Description = w.Products.Description
                     })
                     .ToListAsync();
+
+                if (!wishlistItems.Any())
+                {
+                    return new ResponseDto<List<WishListResDto>>(new List<WishListResDto>(), "No items in wishlist.", 404);
+                }
 
                 return new ResponseDto<List<WishListResDto>>(wishlistItems, "Wishlist retrieved successfully", 200);
             }
@@ -90,8 +95,8 @@ namespace Pet_s_Land.Repositories
             {
                 return new ResponseDto<List<WishListResDto>>(null, "Error fetching wishlist", 500, ex.Message);
             }
-
         }
+
 
 
 

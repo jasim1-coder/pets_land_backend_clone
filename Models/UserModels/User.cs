@@ -15,10 +15,12 @@ namespace Pet_s_Land.Models.UserModels
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string? Email { get; set; }
-        [Required(ErrorMessage = "Phone Number is Required")]
-        [MinLength(10, ErrorMessage = "Phone Number must be at least 10 Digits")]
 
-        public int PhoneNo { get; set; }
+        [Required]
+        [StringLength(15)]
+        [RegularExpression(@"^\+?[1-9][0-9]{7,14}$", ErrorMessage = "Invalid phone number.")]
+        public string? PhoneNumber { get; set; }
+
 
         [Required(ErrorMessage ="User Name is required")]
         public string UserName { get; set; }

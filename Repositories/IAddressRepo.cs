@@ -72,32 +72,40 @@ namespace Pet_s_Land.Repositories
         {
             try
             {
-                if (userId == null)
+                if (addressId == 0)
                 {
-                    throw new Exception("UserId is not valid");
-                }
-                if (addressId == 0 || addressId == null)
-                {
-                    throw new Exception("Address with such id does not exists");
+                    return new ResponseDto<bool>(false, "Invalid address ID", 400);
                 }
 
-                var address = await _appDbContext.Addresses.FirstOrDefaultAsync(u => u.UserId == userId & u.AddressId == addressId);
+                // Check if the address exists
+                var address = await _appDbContext.Addresses
+                    .FirstOrDefaultAsync(a => a.UserId == userId && a.AddressId == addressId);
+
                 if (address == null)
                 {
                     return new ResponseDto<bool>(false, "No address available", 404);
                 }
 
+                // Check if the address is linked to any orders
+                bool isAddressUsedInOrders = await _appDbContext.Orders
+                    .AnyAsync(o => o.AddressId == addressId);
+
+                if (isAddressUsedInOrders)
+                {
+                    return new ResponseDto<bool>(false, "Address cannot be deleted as it is linked to an order", 400);
+                }
+
                 _appDbContext.Addresses.Remove(address);
-
                 await _appDbContext.SaveChangesAsync();
-                return new ResponseDto<bool>(true, "Address removed successfully", 200);
 
+                return new ResponseDto<bool>(true, "Address removed successfully", 200);
             }
             catch (Exception ex)
             {
-                return new ResponseDto<bool>(false, ex.Message, 400);
+                return new ResponseDto<bool>(false, ex.Message, 500);
             }
         }
+
 
         public async Task<ResponseDto<List<AddressResDto>>> GetAddresses(int userId)
         {

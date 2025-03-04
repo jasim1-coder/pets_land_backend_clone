@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xofWCXs8RJ0=",
+  "dgSpecHash": "sSXeRSXBjyo=",
   "success": true,
-  "projectFilePath": "C:\\Users\\jasim\\OneDrive\\Desktop\\Pet's Land Ecommerce .Net\\Pets_Land\\Pets_Land.csproj",
+  "projectFilePath": "C:\\Users\\jasim\\OneDrive\\Desktop\\project_backend\\Pets_Land_.Net\\Pets_Land.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jasim\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\jasim\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",

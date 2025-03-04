@@ -105,53 +105,52 @@ namespace Pet_s_Land.Repositories
             {
                 if (userId == 0)
                 {
-                    return new ResponseDto<CartResDto>(null, "User Id is null", 404);
+                    return new ResponseDto<CartResDto>(null, "User Id is null", 400);
                 }
 
                 var cart = await _appDbContext.Carts
                     .Include(c => c.CartItems)
-                    .ThenInclude(p => p.Product)
+                    .ThenInclude(ci => ci.Product)
                     .FirstOrDefaultAsync(x => x.UserId == userId);
 
-                if (cart != null)
+
+                if (cart == null || !cart.CartItems.Any(x => x.Product != null && !x.Product.IsDeleted))
                 {
-                    var cartitem = cart.CartItems.Select(x => new CartViewDto
+                    return new ResponseDto<CartResDto>(new CartResDto
+                    {
+                        TotalItem = 0,
+                        TotalPrice = 0,
+                        cartItemsperUser = []
+                    }, "No items in cart.", 404);
+                }
+
+                var cartItems = cart.CartItems
+                    .Where(x => x.Product != null && !x.Product.IsDeleted) // Exclude deleted products
+                    .Select(x => new CartViewDto
                     {
                         ProductId = x.ProductId,
                         ProductName = x.Product.Name,
-                        Price = x.Product.Price,
+                        Price = x.Product.RP,
                         Quantity = x.Quantity,
-                        TotalAmount = x.Quantity * x.Product.Price,
+                        TotalAmount = x.Quantity * x.Product.RP,
                         Image = x.Product.Image
                     }).ToList();
 
-                    var TotalItems = cartitem.Count;
-                    var TotalPrice = cartitem.Sum(i => i.TotalAmount);
-
-                    var result = new CartResDto
-                    {
-                        TotalItem = TotalItems,
-                        TotalPrice = TotalPrice,
-                        cartItemsperUser = cartitem
-                    };
-
-                    return new ResponseDto<CartResDto>(result, "Cart retrived successfully", 200);
-                }
-                var Noresult = new CartResDto
+                var result = new CartResDto
                 {
-                    TotalItem = 0,
-                    TotalPrice = 0,
-                    cartItemsperUser = []
-
+                    TotalItem = cartItems.Count,
+                    TotalPrice = cartItems.Sum(i => i.TotalAmount),
+                    cartItemsperUser = cartItems
                 };
 
-                return new ResponseDto<CartResDto>(Noresult, "No itmes in cart.", 404);
+                return new ResponseDto<CartResDto>(result, "Cart retrieved successfully.", 200);
             }
             catch (Exception ex)
             {
-                return new ResponseDto<CartResDto>(null, "Internal Server Error Occurred: " + ex.Message, 500);
+                return new ResponseDto<CartResDto>(null, "Internal Server Error: " + ex.Message, 500);
             }
         }
+
 
 
         public async Task<ResponseDto<object>> RemoveFromCart(int userId, int productId)

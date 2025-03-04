@@ -64,11 +64,26 @@ namespace Pet_s_Land.Datas
 
             //CartItem to product relation
             modelBuilder.Entity<CartItem>()
-                .HasOne(c => c.Product)
-                .WithMany(c => c.CartItems)
-                .HasForeignKey(i => i.ProductId);
+                .HasOne(ci => ci.Product)
+                .WithMany()
+                .HasForeignKey(ci => ci.ProductId)
+                .OnDelete(DeleteBehavior.Cascade); 
 
-            
+            modelBuilder.Entity<Product>()
+                .Property(p => p.IsDeleted)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<Product>().HasQueryFilter(p => !p.IsDeleted);
+
+
+
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(oi => oi.Product)
+                .WithMany()
+                .HasForeignKey(oi => oi.ProductId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+
             modelBuilder.Entity<Order>()
                 .HasOne(u => u.User)
                 .WithMany(u => u.Orders)
@@ -80,18 +95,20 @@ namespace Pet_s_Land.Datas
                 .WithMany(o => o.OrderItems)
                 .HasForeignKey(o => o.OrderId);
             
-            modelBuilder.Entity<OrderItem>()
-                .HasOne(p => p.Product)
-                .WithMany()
-                .HasForeignKey(p => p.ProductId);
+            //modelBuilder.Entity<OrderItem>()
+            //    .HasOne(p => p.Product)
+            //    .WithMany()
+            //    .HasForeignKey(p => p.ProductId);
             
             modelBuilder.Entity<OrderItem>()
                 .Property(pr => pr.TotalPrice)
                 . HasPrecision(30, 2);
+
             modelBuilder.Entity<Address>()
                 .HasOne(a => a.User)
                 .WithMany(u => u.Addresses)
                 .HasForeignKey(u => u.UserId);
+
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Address)
                 .WithMany(a => a.Orders)
@@ -115,8 +132,5 @@ namespace Pet_s_Land.Datas
             new Category { CategoryId = 2, CategoryName = "Cat" });
 
         }
-
-
-
     }
 }

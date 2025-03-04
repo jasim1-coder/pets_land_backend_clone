@@ -43,22 +43,6 @@
   },
   {
     "ContainingType": "Pet_s_Land.Controllers.AdminController",
-    "Method": "DeleteProduct",
-    "RelativePath": "api/Admin/{productId}",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "productId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Pet_s_Land.Controllers.AdminController",
     "Method": "GetAllOrdersWithItems",
     "RelativePath": "api/Admin/all-orders",
     "HttpMethod": "GET",
@@ -79,6 +63,22 @@
         "Name": "Id",
         "Type": "System.Int32",
         "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Pet_s_Land.Controllers.AdminController",
+    "Method": "DeleteProduct",
+    "RelativePath": "api/Admin/DeleteProduct/{productId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Int32",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []
@@ -158,12 +158,12 @@
         "IsRequired": false
       },
       {
-        "Name": "Price",
+        "Name": "RP",
         "Type": "System.Decimal",
         "IsRequired": false
       },
       {
-        "Name": "OldPrice",
+        "Name": "MRP",
         "Type": "System.Decimal",
         "IsRequired": false
       },
@@ -289,7 +289,7 @@
   {
     "ContainingType": "Pet_s_Land.Controllers.CartController",
     "Method": "GetCartItems",
-    "RelativePath": "api/Cart/GetCart Items",
+    "RelativePath": "api/Cart/GetCartItems",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -450,12 +450,12 @@
         "IsRequired": false
       },
       {
-        "Name": "Price",
+        "Name": "RP",
         "Type": "System.Decimal",
         "IsRequired": false
       },
       {
-        "Name": "OldPrice",
+        "Name": "MRP",
         "Type": "System.Decimal",
         "IsRequired": false
       },

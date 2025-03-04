@@ -67,7 +67,7 @@ namespace Pet_s_Land.Controllers
         }
 
 
-        [HttpDelete("{productId}")]
+        [HttpDelete("DeleteProduct/{productId}")]
         public async Task<IActionResult> DeleteProduct(int productId)
         {
             var response = await _adminServices.DeleteProduct(productId);

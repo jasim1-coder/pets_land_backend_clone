@@ -35,11 +35,10 @@ namespace Pet_s_Land.Repositories
         {
             try
             {
-                // Ensure case-insensitive check
+                // Ensure case-insensitive check for existing users
                 var user = await _appDbContext.Users
                     .Where(u => u.Email.ToLower() == regdata.Email.ToLower() || u.UserName.ToLower() == regdata.UserName.ToLower())
                     .FirstOrDefaultAsync();
-
 
                 if (user != null)
                 {
@@ -47,14 +46,31 @@ namespace Pet_s_Land.Repositories
                     return new ResponseDto<object>(null, "User already exists", 400, "Email or UserName is already taken.");
                 }
 
+                // Validate phone number before proceeding
+                if (string.IsNullOrWhiteSpace(regdata.PhoneNo))
+                {
+                    return new ResponseDto<object>(null, "Phone number is required", 400, "Phone number cannot be empty.");
+                }
+
                 // Hash password before saving
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(regdata.Password);
-                var users = _mapper.Map<User>(regdata);
-                users.Password = hashedPassword;
 
+                // Create a new user object
+                var users = new User
+                {
+                    Name = regdata.Name,
+                    Email = regdata.Email,
+                    UserName = regdata.UserName,
+                    Password = hashedPassword,  // Assign hashed password directly
+                    PhoneNumber = regdata.PhoneNo,  // Assign after validation
+                    Role = "User"
+                };
+
+                // Add user to the database
                 await _appDbContext.Users.AddAsync(users);
                 await _appDbContext.SaveChangesAsync();
 
+                // Prepare response DTO
                 var result = new UserResDto
                 {
                     Name = regdata.Name,
@@ -68,9 +84,11 @@ namespace Pet_s_Land.Repositories
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.InnerException?.Message);
                 return new ResponseDto<object>(null, "An error occurred", 500, ex.Message);
             }
         }
+
 
 
         public async Task<ResponseDto<JwtResponseDto>> LoginUser(LoginRequestDto loginData)

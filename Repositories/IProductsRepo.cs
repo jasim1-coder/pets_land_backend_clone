@@ -70,7 +70,7 @@ namespace Pet_s_Land.Repositories
                     {
                         Id = p.Id,
                         Name = p.Name,
-                        Price = p.Price,
+                        RP = p.RP,
                         ImageUrl = p.Image,
                         Category = p.Category.CategoryName,
                         Seller = p.Seller,
@@ -164,7 +164,7 @@ namespace Pet_s_Land.Repositories
                     {
                         Id = p.Id,
                         Name = p.Name,
-                        Price = p.Price,
+                        RP = p.RP,
                         ImageUrl = p.Image,
                         Category = p.Category.CategoryName,
                         Seller = p.Seller,
