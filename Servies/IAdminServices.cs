@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
 using Pet_s_Land.DTOs;
+using Pet_s_Land.Enums;
 using Pet_s_Land.Models.OrderModels;
 using Pet_s_Land.Models.UserModels;
 using Pet_s_Land.Repositories;
@@ -20,6 +21,11 @@ namespace Pet_s_Land.Servies
 
         Task<ResponseDto<List<OrderDto>>> GetAllOrdersWithItems();
         Task<ResponseDto<List<OrderDto>>> GetUserOrders(int userId);
+        Task<ResponseDto<List<OrderDto>>> FilterOrderDetails(int? userId, OrderStatusEnum? status, DateTime? startDate, DateTime? endDate);
+
+
+        Task<ResponseDto<string>> UpdateOrderStatus(int orderId, OrderStatusEnum newStatus, int adminId);
+
 
 
         Task<ResponseDto<string>> DeleteProduct(int productId);
@@ -80,11 +86,24 @@ namespace Pet_s_Land.Servies
             return await _adminRepo.UpdateProductAsync(productId, productData);
 
         }
-         
+
+        public async Task<ResponseDto<string>> UpdateOrderStatus(int orderId, OrderStatusEnum newStatus, int adminId)
+
+        {
+            return await _adminRepo.UpdateOrderStatus(orderId,  newStatus,  adminId);
+
+        }
+
+
         public async Task<ResponseDto<List<OrderDto>>> GetUserOrders(int userId)
         {
             return await _adminRepo.GetUserOrders(userId);
 
+        }
+
+        public async Task<ResponseDto<List<OrderDto>>> FilterOrderDetails(int? userId, OrderStatusEnum? status, DateTime? startDate, DateTime? endDate)
+        {
+            return await _adminRepo.FilterOrderDetails(userId, status, startDate, endDate);
         }
 
     }

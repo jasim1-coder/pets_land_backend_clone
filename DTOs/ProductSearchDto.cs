@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public decimal RP { get; set; }
+        public decimal MRP { get; set; }
         public string ImageUrl { get; set; }
         public string Category { get; set; }
         public string Seller { get; set; }

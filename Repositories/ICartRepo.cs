@@ -86,7 +86,7 @@ namespace Pet_s_Land.Repositories
                 };
                 user.Cart.CartItems.Add(item);
                 await _appDbContext.SaveChangesAsync();
-                return new ResponseDto<object>(null, "Product added successfully", 200);
+                return new ResponseDto<object>(null, "Product added to cart successfully", 200);
 
 
             }
@@ -94,7 +94,6 @@ namespace Pet_s_Land.Repositories
             {
                 return new ResponseDto<object>(null, "Internal Server Error Occured", 500);
             }
-
 
         }
 

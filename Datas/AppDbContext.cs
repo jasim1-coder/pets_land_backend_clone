@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Pet_s_Land.Enums;
 using Pet_s_Land.Models.AdressModels;
 using Pet_s_Land.Models.CartModels;
 using Pet_s_Land.Models.CategoryModels;
@@ -116,9 +118,9 @@ namespace Pet_s_Land.Datas
                 .OnDelete(DeleteBehavior.Restrict);
 
             
-            modelBuilder.Entity<Order>()
-                .Property(o => o.OrderStatus)
-                .HasDefaultValue("pending");
+            //modelBuilder.Entity<Order>()
+            //    .Property(o => o.OrderStatus)
+            //    .HasDefaultValue("pending");
 
 
             modelBuilder.Entity<Product>()
@@ -126,6 +128,36 @@ namespace Pet_s_Land.Datas
                 .WithMany(c => c.Products)
                 .HasForeignKey(c => c.CategoryId);
 
+            //            modelBuilder.Entity<Order>()
+            //                .Property(o => o.OrderStatus)
+            //                .HasDefaultValue(OrderStatusEnum.Pending);
+
+            //            var converter = new ValueConverter<OrderStatusEnum, string>(
+            //    v => v.ToString(), // Convert Enum -> String (for saving)
+            //    v => (OrderStatusEnum)Enum.Parse(typeof(OrderStatusEnum), v) // Convert String -> Enum (for reading)
+            //);
+
+            //            modelBuilder.Entity<Order>()
+            //                .Property(o => o.OrderStatus)
+            //                .HasConversion(converter);
+
+
+            //modelBuilder.Entity<Order>()
+            //    .Property(o => o.OrderStatus)
+            //    .HasDefaultValue(OrderStatusEnum.Pending) // Store as int (0)
+            //    .HasConversion(new ValueConverter<OrderStatusEnum, int>(
+            //        v => (int)v, // Convert Enum -> Int (for saving in DB)
+            //        v => (OrderStatusEnum)v // Convert Int -> Enum (for reading from DB)
+            //    ));
+
+            //        modelBuilder.Entity<Order>()
+            //.Property(o => o.OrderStatus)
+            //.HasDefaultValue(OrderStatusEnum.Pending) // Default is 0 (Pending)
+            //.HasConversion<int>();
+            modelBuilder.Entity<Order>()
+                .Property(o => o.OrderStatus)
+                .HasDefaultValue(OrderStatusEnum.Pending)  // ✅ Set default value as Enum (which is internally an int)
+                .HasConversion<int>();
 
             modelBuilder.Entity<Category>().HasData(
             new Category { CategoryId = 1, CategoryName = "Dog" },

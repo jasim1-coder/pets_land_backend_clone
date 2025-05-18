@@ -32,6 +32,28 @@ namespace Pet_s_Land.Controllers
         public async Task<ActionResult> AddToCart(int productId)
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+           Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+            Console.WriteLine($"Received productId: {productId}"); // Debugging
+
+
 
             int UserId = int.Parse(userIdClaim.Value);
             var result = await _cartServices.AddToCart(UserId, productId);

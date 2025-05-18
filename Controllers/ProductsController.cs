@@ -25,7 +25,7 @@ namespace Pet_s_Land.Controllers
         [Authorize(Roles = "Admin")]
 
         [HttpPost("add")]
-        public async Task<IActionResult> AddProduct(AddProductDto productData)
+        public async Task<IActionResult> AddProduct([FromForm] AddProductDto productData)
         {
             if (productData.Image == null || productData.Image.Length == 0)
             {

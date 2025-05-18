@@ -162,14 +162,19 @@ namespace Pet_s_Land.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ModifiedByAdminId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("OrderStatus")
-                        .IsRequired()
+                    b.Property<int>("OrderStatus")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("pending");
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("OrderString")
                         .HasColumnType("nvarchar(max)");

@@ -19,7 +19,7 @@ namespace Pet_s_Land.Controllers
             _wishListServices = wishListServices;
         }
 
-        [HttpPost("AddOrRemoveFrom WishList")]
+        [HttpPost("AddOrRemoveFromWishList")]
         public async Task<ActionResult> AddOrRemoveFromWishlist(int ProductId)
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");

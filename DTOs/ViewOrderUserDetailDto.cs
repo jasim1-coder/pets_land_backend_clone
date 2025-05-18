@@ -19,6 +19,7 @@ namespace Pet_s_Land.DTOs
         public int Id { get; set; }
         public DateTime OrderDate { get; set; }
         public string OrderStatus { get; set; }
+        public DateTime UpdatedDate { get; set; }
         public string TransactionId { get; set; }
         public decimal TotalPrice { get; set; }
 

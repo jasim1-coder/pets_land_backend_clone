@@ -9,6 +9,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static Pet_s_Land.Repositories.PaymentRepo;
+using Pet_s_Land.Enums;
+using Microsoft.AspNetCore.DataProtection;
+using System.Net.Sockets;
 
 namespace Pet_s_Land.Repositories
 {
@@ -24,8 +27,8 @@ namespace Pet_s_Land.Repositories
     public class PaymentRepo : IPaymentRepo
     {
         private readonly AppDbContext _appDbContext;
-        private const string RazorpayKey = "";
-        private const string RazorpaySecret = "";
+        private const string RazorpayKey = "rzp_test_0tXIKrnrJFMZ96";
+        private const string RazorpaySecret = "UarcsZ5rJvpLA5lEgn5YAwLE";
 
         public PaymentRepo(AppDbContext appDbContext)
         {
@@ -36,6 +39,10 @@ namespace Pet_s_Land.Repositories
         {
             try
             {
+                if(price <= 0)
+                {
+                    return new ResponseDto<string>(null, "enter a valid amount", 400);
+                }
                 var client = new RazorpayClient(RazorpayKey, RazorpaySecret);
                 var order = client.Order.Create(new Dictionary<string, object>
                 {
@@ -65,24 +72,37 @@ namespace Pet_s_Land.Repositories
 
         public async Task<ResponseDto<bool>> RazorPayment(PaymentDto payment)
         {
+            if (payment == null ||
+                string.IsNullOrEmpty(payment.razorpay_payment_id) ||
+                string.IsNullOrEmpty(payment.razorpay_order_id) ||
+                string.IsNullOrEmpty(payment.razorpay_signature))
+            {
+                return new ResponseDto<bool>(false, "Invalid payment details", 404);
+            }
 
             try
             {
-                if (payment == null ||
-                    string.IsNullOrEmpty(payment.RazorpayPaymentId) ||
-                    string.IsNullOrEmpty(payment.RazorpayOrderId) ||
-                    string.IsNullOrEmpty(payment.RazorpaySignature))
-                {
-                    return new ResponseDto<bool>(false, "Invalid payment details", 404);
-                }
+                Dictionary<string, string> attributes = new Dictionary<string, string>
+        {
+            { "razorpay_payment_id", payment.razorpay_payment_id },
+            { "razorpay_order_id", payment.razorpay_order_id },
+            { "razorpay_signature", payment.razorpay_signature },
+             { "secret", RazorpaySecret }
 
-                string generatedSignature = GenerateSignature(payment.RazorpayPaymentId, payment.RazorpayOrderId);
-                if (payment.RazorpaySignature == generatedSignature)
-                {
+        };
+
+                // Verify the Razorpay signature using their library
+                Utils.verifyPaymentSignature(attributes);
+
+
+                
                     return new ResponseDto<bool>(true, "Payment verified successfully", 200);
-                }
+                
 
-                return new ResponseDto<bool>(false, "Payment verification failed", 400);
+            }
+            catch (Razorpay.Api.Errors.SignatureVerificationError ex)
+            {
+                return new ResponseDto<bool>(false, "Invalid signature: " + ex.Message, 400);
             }
             catch (Exception ex)
             {
@@ -91,12 +111,9 @@ namespace Pet_s_Land.Repositories
         }
 
 
-        private string GenerateSignature(string paymentId, string orderId)
-        {
-            using var hmac = new HMACSHA256(Encoding.ASCII.GetBytes(RazorpaySecret));
-            var hashBytes = hmac.ComputeHash(Encoding.ASCII.GetBytes(orderId + "|" + paymentId));
-            return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-        }
+
+
+
 
         public async Task<ResponseDto<bool>> CreateOrder(int userId, CreateOrderDto createOrderDTO)
         {
@@ -116,14 +133,14 @@ namespace Pet_s_Land.Repositories
                 {
                     UserId = userId,
                     OrderDate = DateTime.Now,
-                    OrderStatus = "Pending",
+                    OrderStatus = OrderStatusEnum.Pending,
                     AddressId = createOrderDTO.AddressId,
                     TotalAmount = createOrderDTO.TotalAmount,
                     //OrderString = createOrderDTO.OrderString,
                     TransactionId = createOrderDTO.TransactionId,
                     OrderItems = cart.CartItems.Select(c => new OrderItem
                     {
-                        Id = c.ProductId,
+                        ProductId = c.ProductId,
                         Quantity = c.Quantity,
                         TotalPrice = c.Quantity * c.Product.RP
                     }).ToList(),
@@ -176,18 +193,6 @@ namespace Pet_s_Land.Repositories
                 if (cart == null || !cart.CartItems.Any())
                     return new ResponseDto<bool>(false, "Cart is empty.", 400);
 
-
-                //  Calculate actual total price from cart items
-                decimal actualTotalPrice = cart.CartItems.Sum(item => item.Quantity * item.Product.RP);
-
-                //  Validate total price before proceeding
-                if (actualTotalPrice != createOrderDTO.TotalAmount)
-                {
-                    return new ResponseDto<bool>(false, "Total price mismatch. Please refresh and try again.", 400);
-                }
-
-
-
                 // Check stock availability and deduct stock
                 foreach (var item in cart.CartItems)
                 {
@@ -201,10 +206,10 @@ namespace Pet_s_Land.Repositories
                 {
                     UserId = userId,
                     AddressId = createOrderDTO.AddressId,
-                    TotalAmount = actualTotalPrice,
+                    TotalAmount = createOrderDTO.TotalAmount,
                     TransactionId = !string.IsNullOrEmpty(createOrderDTO.TransactionId) ? createOrderDTO.TransactionId : Guid.NewGuid().ToString(),
                     OrderDate = DateTime.UtcNow,
-                    OrderStatus = "Pending"
+                    OrderStatus = OrderStatusEnum.Pending
                 };
 
                 _appDbContext.Orders.Add(order);
@@ -297,6 +302,7 @@ namespace Pet_s_Land.Repositories
                     OrderStatus = order.OrderStatus.ToString(),
                     TransactionId = order.TransactionId ?? "N/A",
                     TotalPrice = order.OrderItems.Sum(oi => oi.TotalPrice),
+                    UpdatedDate = order.ModifiedDate ?? order.OrderDate,
 
                     CustomerName = order.User?.Name ?? "Unknown", // Fetch from User
                     PhoneNumber = order.Address?.PhoneNumber ?? "N/A", // Fetch from Address

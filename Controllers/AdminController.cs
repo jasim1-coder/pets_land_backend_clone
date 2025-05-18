@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Pet_s_Land.DTOs;
+using Pet_s_Land.Enums;
 using Pet_s_Land.Repositories;
 using Pet_s_Land.Servies;
 
@@ -90,6 +91,45 @@ namespace Pet_s_Land.Controllers
             var respnse = await _adminServices.GetUserOrders(userId);
             return StatusCode(Response.StatusCode, respnse);
         }
+        [HttpGet("filter-orders")]
+        public async Task<IActionResult> FilterOrderDetails([FromQuery] int? userId, [FromQuery] OrderStatusEnum? status, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+        {
+
+            var response = await _adminServices.FilterOrderDetails(userId, status, startDate, endDate);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        //[HttpGet("filter-orders")]
+        //public async Task<IActionResult> FilterOrderDetails(int? userId, string? status, DateTime? startDate, DateTime? endDate)
+        //{
+        //    // Convert the status string to OrderStatusEnum
+        //    OrderStatusEnum? orderStatus = null;
+        //    if (!string.IsNullOrEmpty(status))
+        //    {
+        //        if (Enum.TryParse(typeof(OrderStatusEnum), status, true, out var parsedStatus))
+        //        {
+        //            orderStatus = (OrderStatusEnum)parsedStatus;
+        //        }
+        //        else
+        //        {
+        //            return BadRequest(new ResponseDto<List<OrderDto>>(null, "Invalid order status.", 400));
+        //        }
+        //    }
+
+        //    var response = await _adminServices.FilterOrderDetails(userId, orderStatus, startDate, endDate);
+        //    return StatusCode(response.StatusCode, response);
+        //}
+
+        [HttpPut("update-order-status")]
+        public async Task<IActionResult> UpdateOrderStatus(int orderId, OrderStatusEnum newStatus)
+        {
+
+            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            int adminId = int.Parse(userIdClaim.Value);
+            var result = await _adminServices.UpdateOrderStatus(orderId,newStatus, adminId);
+            return StatusCode(result.StatusCode, result);
+        }
+
 
 
         [HttpDelete("DeleteProduct/{productId}")]

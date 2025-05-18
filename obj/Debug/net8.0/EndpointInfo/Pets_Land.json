@@ -184,6 +184,80 @@
         }
       }
     },
+    "/api/Admin/filter-orders": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatusEnum"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Admin/update-order-status": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "newStatus",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatusEnum"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Admin/DeleteProduct/{productId}": {
       "delete": {
         "tags": [
@@ -227,17 +301,6 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "CategoryId",
-                  "Description",
-                  "Image",
-                  "Ingredients",
-                  "MRP",
-                  "Name",
-                  "RP",
-                  "Seller",
-                  "Stock"
-                ],
                 "type": "object",
                 "properties": {
                   "Name": {
@@ -251,18 +314,14 @@
                     "format": "int32"
                   },
                   "RP": {
-                    "minimum": 0,
                     "type": "number",
                     "format": "double"
                   },
                   "MRP": {
-                    "minimum": 0,
                     "type": "number",
                     "format": "double"
                   },
                   "Stock": {
-                    "maximum": 2147483647,
-                    "minimum": 0,
                     "type": "integer",
                     "format": "int32"
                   },
@@ -708,100 +767,75 @@
         "tags": [
           "Products"
         ],
-        "parameters": [
-          {
-            "name": "Name",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Description",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "CategoryId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "RP",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "minimum": 0,
-              "type": "number",
-              "format": "double"
-            }
-          },
-          {
-            "name": "MRP",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "minimum": 0,
-              "type": "number",
-              "format": "double"
-            }
-          },
-          {
-            "name": "Stock",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "maximum": 2147483647,
-              "minimum": 0,
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "Ingredients",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "name": "Seller",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "Image"
-                ],
                 "type": "object",
                 "properties": {
+                  "Name": {
+                    "type": "string"
+                  },
+                  "Description": {
+                    "type": "string"
+                  },
+                  "CategoryId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "RP": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "MRP": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "Stock": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
                   "Image": {
                     "type": "string",
                     "format": "binary"
+                  },
+                  "Ingredients": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "Seller": {
+                    "type": "string"
                   }
                 }
               },
               "encoding": {
+                "Name": {
+                  "style": "form"
+                },
+                "Description": {
+                  "style": "form"
+                },
+                "CategoryId": {
+                  "style": "form"
+                },
+                "RP": {
+                  "style": "form"
+                },
+                "MRP": {
+                  "style": "form"
+                },
+                "Stock": {
+                  "style": "form"
+                },
                 "Image": {
+                  "style": "form"
+                },
+                "Ingredients": {
+                  "style": "form"
+                },
+                "Seller": {
                   "style": "form"
                 }
               }
@@ -922,7 +956,7 @@
         }
       }
     },
-    "/api/WishList/AddOrRemoveFrom WishList": {
+    "/api/WishList/AddOrRemoveFromWishList": {
       "post": {
         "tags": [
           "WishList"
@@ -1062,18 +1096,29 @@
         },
         "additionalProperties": false
       },
+      "OrderStatusEnum": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "PaymentDto": {
         "type": "object",
         "properties": {
-          "razorpayPaymentId": {
+          "razorpay_payment_id": {
             "type": "string",
             "nullable": true
           },
-          "razorpayOrderId": {
+          "razorpay_order_id": {
             "type": "string",
             "nullable": true
           },
-          "razorpaySignature": {
+          "razorpay_signature": {
             "type": "string",
             "nullable": true
           }

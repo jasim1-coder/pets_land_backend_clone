@@ -12,8 +12,8 @@ using Pet_s_Land.Datas;
 namespace Pet_s_Land.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250228064637_fixed")]
-    partial class @fixed
+    [Migration("20250304103817_ordertableupdation")]
+    partial class ordertableupdation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -109,6 +109,9 @@ namespace Pet_s_Land.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProductId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -117,6 +120,8 @@ namespace Pet_s_Land.Migrations
                     b.HasIndex("CartId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("ProductId1");
 
                     b.ToTable("CartItems");
                 });
@@ -160,14 +165,19 @@ namespace Pet_s_Land.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ModifiedByAdminId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("OrderStatus")
-                        .IsRequired()
+                    b.Property<int>("OrderStatus")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("pending");
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("OrderString")
                         .HasColumnType("nvarchar(max)");
@@ -201,8 +211,14 @@ namespace Pet_s_Land.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int?>("ProductId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ProductImage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -242,6 +258,11 @@ namespace Pet_s_Land.Migrations
                     b.PrimitiveCollection<string>("Ingredients")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<decimal>("MRP")
                         .HasColumnType("decimal(18,2)");
@@ -369,10 +390,14 @@ namespace Pet_s_Land.Migrations
                         .IsRequired();
 
                     b.HasOne("Pet_s_Land.Models.ProductsModels.Product", "Product")
-                        .WithMany("CartItems")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Pet_s_Land.Models.ProductsModels.Product", null)
+                        .WithMany("CartItems")
+                        .HasForeignKey("ProductId1");
 
                     b.Navigation("Cart");
 
@@ -409,8 +434,7 @@ namespace Pet_s_Land.Migrations
                     b.HasOne("Pet_s_Land.Models.ProductsModels.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Order");
 
